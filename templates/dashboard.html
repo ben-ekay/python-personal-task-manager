@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <header>
+        <h1>Personal Task Manager</h1>
+        <p>Welcome, {{ session["user_name"] }}</p>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Your Dashboard</h2>
+
+            <section class="dashboard-stats">
+                <div class="stat-card">
+                    <h3>Total Tasks</h3>
+                    <p>{{ total_tasks }}</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Completed</h3>
+                    <p>{{ completed_tasks }}</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Pending</h3>
+                    <p>{{ pending_tasks }}</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Progress</h3>
+                    <p>{{ completion_percentage }}%</p>
+                </div>
+            </section>
+
+            <p>Your personal tasks will appear here.</p>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <label for="title">Task</label>
+
+                <input type="text" id="title" name="title" placeholder="Enter a task" required>
+
+                <label for="priority">Priority</label>
+
+                <select id="priority" name="priority">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                </select>
+
+                <label for="deadline">Deadline</label>
+                <input type="date" id="deadline" name="deadline">
+
+                <button type="submit" class="button">
+                    Add Task
+                </button>
+            </form>
+
+            <h2>Your Tasks</h2>
+
+            <form method="GET" action="{{ url_for('dashboard') }}">
+                <label for="status">Filter by status</label>
+
+                <select id="status" name="status">
+                    <option value="all" {% if selected_status=="all" %}selected{% endif %}>
+                        All Tasks
+                    </option>
+                    <option value="pending" {% if selected_status=="pending" %}selected{% endif %}>
+                        Pending
+                    </option>
+                    <option value="completed" {% if selected_status=="completed" %}selected{% endif %}>
+                        Completed
+                    </option>
+                </select>
+
+                <label for="filter_priority">Filter by priority</label>
+
+                <select id="filter_priority" name="priority">
+                    <option value="all" {% if selected_priority=="all" %}selected{% endif %}>
+                        All Priorities
+                    </option>
+                    <option value="Low" {% if selected_priority=="Low" %}selected{% endif %}>
+                        Low
+                    </option>
+                    <option value="Medium" {% if selected_priority=="Medium" %}selected{% endif %}>
+                        Medium
+                    </option>
+                    <option value="High" {% if selected_priority=="High" %}selected{% endif %}>
+                        High
+                    </option>
+                </select>
+
+                <button type="submit" class="button">Filter</button>
+            </form>
+
+            {% if tasks %}
+            <ul class="task-list">
+                {% for task in tasks %}
+                <li class="task-card">
+                    {{ task["title"] }}
+                    <span class="priority priority-{{ task['priority'] | lower }}">
+                        Priority: {{ task["priority"] }}
+                    </span>
+
+                    {% if task["deadline"] %}
+                    <span class="deadline">
+                        Deadline: {{ task["deadline"] }}
+                    </span>
+                    {% endif %}
+
+                    <a href="{{ url_for('edit_task', task_id=task['id']) }}" class="task-button edit">
+                        Edit
+                    </a>
+
+                    {% if task["completed"] == 0 %}
+                    <form method="POST" action="{{ url_for('complete_task', task_id=task['id']) }}"
+                        class="task-action-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <button type="submit" class="task-button complete">
+                            Complete
+                        </button>
+                    </form>
+                    {% else %}
+                    <span class="completed-badge">✓ Completed</span>
+                    {% endif %}
+
+                    <form method="POST" action="{{ url_for('delete_task', task_id=task['id']) }}"
+                        class="task-action-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <button type="submit" class="task-button delete">
+                            Delete
+                        </button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>You do not have any tasks yet.</p>
+            {% endif %}
+
+            <a href="{{ url_for('logout') }}" class="button secondary">
+                Logout
+            </a>
+        </section>
+    </main>
+
+</body>
+
+</html>

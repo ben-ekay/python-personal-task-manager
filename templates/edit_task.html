@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Task</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <header>
+        <h1>Personal Task Manager</h1>
+    </header>
+
+    <main>
+        <section class="hero">
+
+            <h2>Edit Task</h2>
+
+            <form method="POST">
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <label for="title">Task</label>
+
+                <input type="text" id="title" name="title" value="{{ task['title'] }}" required>
+
+                <button type="submit">Save Changes</button>
+
+            </form>
+
+            <a href="{{ url_for('dashboard') }}">
+                Back to Dashboard
+            </a>
+
+        </section>
+    </main>
+
+</body>
+
+</html>

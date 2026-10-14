@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Task Manager</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <header>
+        <h1>Personal Task Manager</h1>
+        <p>Organise your tasks and track your progress.</p>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Stay organised</h2>
+            <p>
+                Create, manage and complete your personal tasks in one place.
+            </p>
+
+            <div class="actions">
+                <a href="{{ url_for('register') }}" class="button">Register</a>
+                <a href="{{ url_for('login') }}" class="button secondary">Login</a>
+            </div>
+        </section>
+    </main>
+
+</body>
+
+</html>
