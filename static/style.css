@@ -249,3 +249,599 @@ button {
     font-family: inherit;
     margin: 5px 3px;
 }
+
+/* ===== TASKFLOW: APP LAYOUT ===== */
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 240px;
+    min-width: 240px;
+    background-color: #111827;
+    color: #ffffff;
+    padding: 30px 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 45px;
+}
+
+.sidebar-brand h1 {
+    font-size: 24px;
+    margin: 0;
+    color: #ffffff;
+}
+
+.brand-icon {
+    background-color: #2563eb;
+    color: #ffffff;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.sidebar-label {
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    color: #9ca3af;
+    margin: 0 0 15px 12px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nav-link {
+    display: block;
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 13px 15px;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    background-color: #374151;
+    color: #ffffff;
+}
+
+.nav-link.active {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: 30px;
+}
+
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    background-color: #f8fafc;
+}
+
+.dashboard-header {
+    background-color: #ffffff;
+    padding: 28px 40px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.dashboard-header h2 {
+    font-size: 25px;
+    margin: 6px 0;
+    color: #111827;
+}
+
+.dashboard-header p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.dashboard-header .header-label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    font-weight: bold;
+    color: #2563eb;
+}
+
+.main-content .hero {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 35px 30px;
+}
+
+@media (max-width: 768px) {
+    .app-layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        min-width: 0;
+        padding: 18px 20px;
+    }
+
+    .sidebar-brand {
+        margin-bottom: 15px;
+    }
+
+    .sidebar-nav {
+        flex-direction: row;
+    }
+
+    .sidebar-footer {
+        margin-top: 10px;
+        padding-top: 0;
+    }
+
+    .dashboard-header {
+        padding: 22px;
+    }
+
+    .main-content .hero {
+        padding: 25px 15px;
+    }
+}
+
+/* ===== DASHBOARD PROGRESS BAR ===== */
+
+.progress-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 9px;
+    background-color: #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 14px;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #2563eb;
+    border-radius: 20px;
+    transition: width 0.3s ease;
+}
+
+.main-content .dashboard-stats {
+    margin-top: 25px;
+    margin-bottom: 35px;
+}
+
+.main-content .stat-card {
+    min-height: 125px;
+    box-sizing: border-box;
+}
+
+.main-content .stat-card h3 {
+    font-size: 14px;
+    margin-top: 0;
+}
+
+.main-content .stat-card p {
+    font-size: 32px;
+}
+
+/* ===== TASKFLOW: COMPACT ADD TASK FORM ===== */
+
+.main-content .add-task-form {
+    max-width: 100%;
+    margin: 20px 0 35px;
+    padding: 24px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 10px 18px;
+    align-items: end;
+}
+
+.add-task-form label {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.add-task-form input,
+.add-task-form select {
+    width: 100%;
+    min-width: 0;
+    height: 42px;
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.add-task-form .button {
+    grid-column: 1 / -1;
+    justify-self: start;
+    background-color: #2563eb;
+    color: #ffffff;
+    border-radius: 8px;
+    margin: 8px 0 0;
+    font-weight: 600;
+}
+
+.add-task-form .button:hover {
+    background-color: #1d4ed8;
+}
+
+@media (max-width: 900px) {
+    .main-content .add-task-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+.add-task-form .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.add-task-form .form-field label {
+    margin: 0;
+}
+
+.add-task-form .form-field input,
+.add-task-form .form-field select {
+    width: 100%;
+}
+
+.filter-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 20px;
+    align-items: end;
+}
+
+.filter-form label {
+    margin: 0;
+}
+
+.filter-form select {
+    width: 100%;
+}
+
+.filter-form .button {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin: 0;
+}
+
+@media (max-width: 600px) {
+    .filter-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+.filter-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 16px;
+    align-items: end;
+    max-width: 900px;
+}
+
+.filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.filter-field label {
+    margin: 0;
+}
+
+.filter-field select {
+    width: 100%;
+    min-height: 40px;
+}
+
+.filter-form .button {
+    grid-column: auto;
+    margin: 0;
+    min-height: 40px;
+}
+
+@media (max-width: 600px) {
+    .filter-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+.task-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.task-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex: 1;
+    min-width: 0;
+}
+
+.task-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.task-actions .task-button {
+    margin: 0;
+}
+
+@media (max-width: 600px) {
+    .task-card {
+        align-items: flex-start;
+    }
+
+    .task-actions {
+        width: 100%;
+    }
+}
+
+.task-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.task-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: #111827;
+    overflow-wrap: anywhere;
+}
+
+.task-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.task-meta .deadline {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.task-card-done {
+    background-color: #ffffff;
+    border-color: #e5e7eb;
+}
+
+.task-card-done .task-title {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+.task-card-done .task-title {
+    text-decoration: line-through;
+    color: #6b7280;
+}
+
+.task-card .deadline.deadline-overdue {
+    color: #dc2626;
+    font-weight: 600;
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+}
+
+/* Minimal task actions */
+
+.task-button.edit,
+.task-button.complete,
+.task-button.delete {
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 6px 8px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.task-button.edit {
+    color: #2563eb;
+}
+
+.task-button.complete {
+    color: #15803d;
+}
+
+.task-button.delete {
+    color: #dc2626;
+}
+
+.task-button.edit:hover,
+.task-button.complete:hover,
+.task-button.delete:hover {
+    background-color: transparent;
+    text-decoration: underline;
+}
+
+/* Minimal task labels */
+
+.priority {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.priority-low {
+    color: #15803d;
+}
+
+.priority-medium {
+    color: #a16207;
+}
+
+.priority-high {
+    color: #b91c1c;
+}
+
+/* Deadline labels */
+
+.deadline {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.deadline.deadline-overdue {
+    background: transparent;
+    color: #dc2626;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    font-weight: 600;
+}
+
+/* Completed status */
+
+.completed-badge {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    color: #15803d;
+    font-weight: 600;
+}
+
+/* Minimal priority colours */
+
+.task-card .priority-low,
+.task-card .priority-medium,
+.task-card .priority-high {
+    color: #64748b;
+}
+
+/* ===== TASKFLOW: UNIFIED TASK METADATA ===== */
+
+.task-card .task-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    line-height: 1.5;
+}
+
+.task-card .task-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+}
+
+.task-card .meta-label {
+    color: #64748b;
+    font-weight: 400;
+}
+
+.task-card .meta-value {
+    color: #334155;
+    font-weight: 600;
+}
+
+.task-card .meta-separator {
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+.task-card .task-overdue {
+    color: #dc2626;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.task-card .task-overdue::before {
+    content: "●";
+    font-size: 8px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* Priority text colours only */
+
+.task-card .priority-value.priority-high {
+    color: #b91c1c;
+}
+
+.task-card .priority-value.priority-medium {
+    color: #a16207;
+}
+
+.task-card .priority-value.priority-low {
+    color: #15803d;
+}
+
+/* Priority: coloured text without backgrounds */
+
+.task-card .priority-value {
+    background: transparent;
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.task-card .priority-value.priority-high {
+    color: #b91c1c;
+}
+
+.task-card .priority-value.priority-medium {
+    color: #a16207;
+}
+
+.task-card .priority-value.priority-low {
+    color: #15803d;
+}

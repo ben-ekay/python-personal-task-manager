@@ -11,150 +11,200 @@
 
 <body>
 
-    <header>
-        <h1>Personal Task Manager</h1>
-        <p>Welcome, {{ session["user_name"] }}</p>
-    </header>
+    <div class="app-layout">
 
-    <main>
-        <section class="hero">
-            <h2>Your Dashboard</h2>
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-icon">✓</span>
+                <h1>TaskFlow</h1>
+            </div>
 
-            <section class="dashboard-stats">
-                <div class="stat-card">
-                    <h3>Total Tasks</h3>
-                    <p>{{ total_tasks }}</p>
+            <p class="sidebar-label">WORKSPACE</p>
+
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-link active">
+                    Dashboard
+                </a>
+
+                <a href="{{ url_for('dashboard') }}#tasks" class="nav-link">
+                    My Tasks
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}" class="nav-link">
+                    Logout
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header">
+                <div>
+                    <p class="header-label">MY WORKSPACE</p>
+                    <h2>Welcome back, {{ session["user_name"] }}!</h2>
+                    <p>Manage your tasks and track your progress.</p>
                 </div>
+            </header>
 
-                <div class="stat-card">
-                    <h3>Completed</h3>
-                    <p>{{ completed_tasks }}</p>
-                </div>
+            <section class="hero">
+                <h2>Your Dashboard</h2>
 
-                <div class="stat-card">
-                    <h3>Pending</h3>
-                    <p>{{ pending_tasks }}</p>
-                </div>
+                <section class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>Total Tasks</h3>
+                        <p>{{ total_tasks }}</p>
+                    </div>
 
-                <div class="stat-card">
-                    <h3>Progress</h3>
-                    <p>{{ completion_percentage }}%</p>
-                </div>
+                    <div class="stat-card">
+                        <h3>Completed</h3>
+                        <p>{{ completed_tasks }}</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>Pending</h3>
+                        <p>{{ pending_tasks }}</p>
+                    </div>
+
+                    <div class="stat-card progress-card">
+                        <h3>Progress</h3>
+                        <p>{{ completion_percentage }}%</p>
+
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ completion_percentage }}%;">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <p>Your personal tasks will appear here.</p>
+                <form method="POST" class="add-task-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="form-field">
+                        <label for="title">Task</label>
+                        <input type="text" id="title" name="title" placeholder="Enter a task" required>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="priority">Priority</label>
+                        <select id="priority" name="priority">
+                            <option value="Low">Low</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="deadline">Deadline</label>
+                        <input type="date" id="deadline" name="deadline">
+                    </div>
+
+                    <button type="submit" class="button">Add Task</button>
+                </form>
+
+                <h2>Your Tasks</h2>
+
+                <form method="GET" action="{{ url_for('dashboard') }}" class="filter-form">
+                    <div class="filter-field">
+                        <label for="status">Filter by status</label>
+                        <select id="status" name="status">
+                            <option value="all" {% if selected_status=="all" %}selected{% endif %}>All Tasks</option>
+                            <option value="pending" {% if selected_status=="pending" %}selected{% endif %}>Pending
+                            </option>
+                            <option value="completed" {% if selected_status=="completed" %}selected{% endif %}>Completed
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="filter-field">
+                        <label for="filter_priority">Filter by priority</label>
+                        <select id="filter_priority" name="priority">
+                            <option value="all" {% if selected_priority=="all" %}selected{% endif %}>All Priorities
+                            </option>
+                            <option value="Low" {% if selected_priority=="Low" %}selected{% endif %}>Low</option>
+                            <option value="Medium" {% if selected_priority=="Medium" %}selected{% endif %}>Medium
+                            </option>
+                            <option value="High" {% if selected_priority=="High" %}selected{% endif %}>High</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="button">Filter</button>
+                </form>
+
+                {% if tasks %}
+                <ul class="task-list">
+                    {% for task in tasks %}
+                    <li class="task-card {% if task['completed'] == 1 %}task-card-done{% endif %}">
+                        <div class="task-info">
+                            <div class="task-details">
+                                <h3 class="task-title">{{ task["title"] }}</h3>
+
+                                <div class="task-meta">
+                                    <span class="task-meta-item">
+                                        <span class="meta-label">Priority:</span>
+                                        <span class="meta-value priority-value priority-{{ task['priority'] | lower }}">
+                                            {{ task["priority"] }}
+                                        </span>
+                                    </span>
+
+                                    {% if task["deadline"] %}
+                                    <span class="meta-separator">·</span>
+
+                                    <span class="task-meta-item">
+                                        <span class="meta-label">Deadline:</span>
+                                        <span class="meta-value">
+                                            {{ task["deadline"][8:10] }}/{{ task["deadline"][5:7] }}/{{
+                                            task["deadline"][0:4] }}
+                                        </span>
+                                    </span>
+
+                                    {% if task["deadline"] < today and task["completed"]==0 %} <span
+                                        class="task-overdue">Overdue</span>
+                                        {% endif %}
+                                        {% endif %}
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="task-actions">
+
+                            <a href="{{ url_for('edit_task', task_id=task['id']) }}" class="task-button edit">
+                                Edit
+                            </a>
+
+                            {% if task["completed"] == 0 %}
+                            <form method="POST" action="{{ url_for('complete_task', task_id=task['id']) }}"
+                                class="task-action-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                                <button type="submit" class="task-button complete">
+                                    Complete
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="completed-badge">✓ Completed</span>
+                            {% endif %}
+
+                            <form method="POST" action="{{ url_for('delete_task', task_id=task['id']) }}"
+                                class="task-action-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                                <button type="submit" class="task-button delete">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>You do not have any tasks yet.</p>
+                {% endif %}
+
             </section>
-
-            <p>Your personal tasks will appear here.</p>
-            <form method="POST">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                <label for="title">Task</label>
-
-                <input type="text" id="title" name="title" placeholder="Enter a task" required>
-
-                <label for="priority">Priority</label>
-
-                <select id="priority" name="priority">
-                    <option value="Low">Low</option>
-                    <option value="Medium" selected>Medium</option>
-                    <option value="High">High</option>
-                </select>
-
-                <label for="deadline">Deadline</label>
-                <input type="date" id="deadline" name="deadline">
-
-                <button type="submit" class="button">
-                    Add Task
-                </button>
-            </form>
-
-            <h2>Your Tasks</h2>
-
-            <form method="GET" action="{{ url_for('dashboard') }}">
-                <label for="status">Filter by status</label>
-
-                <select id="status" name="status">
-                    <option value="all" {% if selected_status=="all" %}selected{% endif %}>
-                        All Tasks
-                    </option>
-                    <option value="pending" {% if selected_status=="pending" %}selected{% endif %}>
-                        Pending
-                    </option>
-                    <option value="completed" {% if selected_status=="completed" %}selected{% endif %}>
-                        Completed
-                    </option>
-                </select>
-
-                <label for="filter_priority">Filter by priority</label>
-
-                <select id="filter_priority" name="priority">
-                    <option value="all" {% if selected_priority=="all" %}selected{% endif %}>
-                        All Priorities
-                    </option>
-                    <option value="Low" {% if selected_priority=="Low" %}selected{% endif %}>
-                        Low
-                    </option>
-                    <option value="Medium" {% if selected_priority=="Medium" %}selected{% endif %}>
-                        Medium
-                    </option>
-                    <option value="High" {% if selected_priority=="High" %}selected{% endif %}>
-                        High
-                    </option>
-                </select>
-
-                <button type="submit" class="button">Filter</button>
-            </form>
-
-            {% if tasks %}
-            <ul class="task-list">
-                {% for task in tasks %}
-                <li class="task-card">
-                    {{ task["title"] }}
-                    <span class="priority priority-{{ task['priority'] | lower }}">
-                        Priority: {{ task["priority"] }}
-                    </span>
-
-                    {% if task["deadline"] %}
-                    <span class="deadline">
-                        Deadline: {{ task["deadline"] }}
-                    </span>
-                    {% endif %}
-
-                    <a href="{{ url_for('edit_task', task_id=task['id']) }}" class="task-button edit">
-                        Edit
-                    </a>
-
-                    {% if task["completed"] == 0 %}
-                    <form method="POST" action="{{ url_for('complete_task', task_id=task['id']) }}"
-                        class="task-action-form">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                        <button type="submit" class="task-button complete">
-                            Complete
-                        </button>
-                    </form>
-                    {% else %}
-                    <span class="completed-badge">✓ Completed</span>
-                    {% endif %}
-
-                    <form method="POST" action="{{ url_for('delete_task', task_id=task['id']) }}"
-                        class="task-action-form">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                        <button type="submit" class="task-button delete">
-                            Delete
-                        </button>
-                    </form>
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <p>You do not have any tasks yet.</p>
-            {% endif %}
-
-            <a href="{{ url_for('logout') }}" class="button secondary">
-                Logout
-            </a>
-        </section>
-    </main>
+        </main>
+    </div>
 
 </body>
 

@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import date
 import os
 
 from flask import Flask, render_template, request, redirect, url_for, session
@@ -242,7 +243,8 @@ def dashboard():
         total_tasks=total_tasks,
         completed_tasks=completed_tasks,
         pending_tasks=pending_tasks,
-        completion_percentage=completion_percentage
+        completion_percentage=completion_percentage,
+        today=date.today().isoformat()
     )
 
 
