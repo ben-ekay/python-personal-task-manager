@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+{% block title %}Login | TaskFlow{% endblock %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-
-<body>
-
+{% block content %}
     <main>
         <section class="hero">
             <h2>Login</h2>
@@ -37,7 +29,4 @@
             </a>
         </section>
     </main>
-
-</body>
-
-</html>
+{% endblock %}

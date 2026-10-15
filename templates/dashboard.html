@@ -1,17 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+{% block title %}Dashboard | TaskFlow{% endblock %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% block styles %}
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
-</head>
+{% endblock %}
 
-<body>
-
+{% block content %}
     <div class="app-layout">
 
         <aside class="sidebar">
@@ -206,7 +201,4 @@
             </section>
         </main>
     </div>
-
-</body>
-
-</html>
+{% endblock %}

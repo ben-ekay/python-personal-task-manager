@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}Edit Task | TaskFlow{% endblock %}
 
-    <title>Edit Task</title>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-
-<body>
-
+{% block content %}
     <header>
         <h1>Personal Task Manager</h1>
     </header>
@@ -39,7 +30,4 @@
 
         </section>
     </main>
-
-</body>
-
-</html>
+{% endblock %}
