@@ -163,7 +163,11 @@ def dashboard():
         return redirect(url_for("login"))
 
     if request.method == "POST":
-        title = request.form["title"]
+        title = request.form["title"].strip()
+
+        if not title or len(title) > 100:
+            return "Task title must contain between 1 and 100 characters.", 400
+
         priority = request.form["priority"]
         deadline = request.form["deadline"]
 

@@ -7,6 +7,7 @@
     <title>Dashboard</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
 </head>
 
 <body>
@@ -103,7 +104,7 @@
                     <button type="submit" class="button">Add Task</button>
                 </form>
 
-                <h2>Your Tasks</h2>
+                <h2 id="tasks">Your Tasks</h2>
 
                 <form method="GET" action="{{ url_for('dashboard') }}" class="filter-form">
                     <div class="filter-field">
