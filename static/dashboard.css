@@ -15,10 +15,10 @@
     align-items: end;
     gap: 20px;
 
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    background-color: var(--color-white);
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-toolbar);
 }
 
 .main-content .filter-field {
@@ -30,7 +30,7 @@
 
 .main-content .filter-field label {
     margin: 0;
-    color: #334155;
+    color: var(--slate-700);
     font-size: 13px;
     font-weight: 600;
 }
@@ -40,23 +40,23 @@
     height: 44px;
     padding: 0 14px;
 
-    background-color: #f8fafc;
-    border: 1px solid #cbd5e1;
-    border-radius: 9px;
+    background-color: var(--slate-50);
+    border: 1px solid var(--slate-300);
+    border-radius: var(--radius-control);
 
-    color: #0f172a;
+    color: var(--slate-900);
     font-family: inherit;
     font-size: 14px;
     cursor: pointer;
 
-    transition: border-color 0.2s ease,
-        box-shadow 0.2s ease;
+    transition: border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
 }
 
 .main-content .filter-field select:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-focus);
 }
 
 .main-content .filter-form .button {
@@ -65,26 +65,26 @@
     padding: 0 26px;
     margin: 0;
 
-    background-color: #2563eb;
-    border: 1px solid #2563eb;
-    border-radius: 9px;
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-control);
 
-    color: #ffffff;
+    color: var(--color-white);
     font-family: inherit;
     font-size: 14px;
     font-weight: 600;
 
-    transition: background-color 0.2s ease,
-        transform 0.2s ease;
+    transition: background-color var(--transition-fast),
+        transform var(--transition-fast);
 }
 
 .main-content .filter-form .button:hover {
-    background-color: #1d4ed8;
+    background-color: var(--color-primary-hover);
     transform: translateY(-1px);
 }
 
 .main-content .filter-form .button:focus-visible {
-    outline: 3px solid rgba(37, 99, 235, 0.3);
+    outline: var(--focus-outline);
     outline-offset: 3px;
 }
 

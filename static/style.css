@@ -1,14 +1,81 @@
+/* ========================================
+   TASKFLOW — DESIGN VARIABLES
+   Each value matches the original exactly.
+======================================== */
+
+:root {
+    /* Brand */
+    --color-primary: #2563eb;
+    --color-primary-hover: #1d4ed8;
+    --color-primary-ring: rgba(37, 99, 235, 0.12);
+    --color-primary-outline: rgba(37, 99, 235, 0.3);
+    --color-navy: #111827;
+    --color-white: #ffffff;
+
+    /* Status */
+    --color-success: #15803d;
+    --color-danger: #dc2626;
+
+    /* Priority (coloured text only) */
+    --color-priority-high: #b91c1c;
+    --color-priority-medium: #a16207;
+    --color-priority-low: #15803d;
+
+    /* Grey palette (gray family) */
+    --gray-700: #374151;
+    --gray-500: #6b7280;
+    --gray-400: #9ca3af;
+    --gray-300: #d1d5db;
+    --gray-200: #e5e7eb;
+
+    /* Grey palette (slate family) */
+    --slate-900: #0f172a;
+    --slate-700: #334155;
+    --slate-500: #64748b;
+    --slate-300: #cbd5e1;
+    --slate-200: #e2e8f0;
+    --slate-50: #f8fafc;
+
+    /* Original starter theme (replaced in Steps 3-5) */
+    --legacy-text: #222222;
+    --legacy-muted: #666666;
+    --legacy-border: #cccccc;
+    --legacy-border-light: #dddddd;
+    --legacy-bg: #f4f4f4;
+
+    /* Corner radius */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-control: 9px;
+    --radius-icon: 10px;
+    --radius-card: 12px;
+    --radius-panel: 14px;
+    --radius-pill: 20px;
+
+    /* Shadows and focus */
+    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.06);
+    --shadow-card-soft: 0 4px 12px rgba(0, 0, 0, 0.04);
+    --shadow-toolbar: 0 4px 16px rgba(15, 23, 42, 0.04);
+    --shadow-focus: 0 0 0 3px var(--color-primary-ring);
+    --focus-outline: 3px solid var(--color-primary-outline);
+
+    /* Typography and motion */
+    --font-sans: Arial, sans-serif;
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.3s ease;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    font-family: var(--font-sans);
+    background-color: var(--legacy-bg);
     margin: 0;
-    color: #222222;
+    color: var(--legacy-text);
 }
 
 header {
-    background-color: #ffffff;
+    background-color: var(--color-white);
     padding: 20px 40px;
-    border-bottom: 1px solid #dddddd;
+    border-bottom: 1px solid var(--legacy-border-light);
 }
 
 header h1 {
@@ -17,7 +84,7 @@ header h1 {
 
 header p {
     margin-bottom: 0;
-    color: #666666;
+    color: var(--legacy-muted);
 }
 
 main {
@@ -36,7 +103,7 @@ main {
 }
 
 .hero p {
-    color: #666666;
+    color: var(--legacy-muted);
     font-size: 18px;
 }
 
@@ -48,15 +115,15 @@ main {
     display: inline-block;
     padding: 12px 24px;
     margin: 5px;
-    background-color: #222222;
-    color: #ffffff;
+    background-color: var(--legacy-text);
+    color: var(--color-white);
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
 }
 
 .button.secondary {
-    background-color: #dddddd;
-    color: #222222;
+    background-color: var(--legacy-border-light);
+    color: var(--legacy-text);
 }
 
 form {
@@ -113,24 +180,24 @@ button {
 }
 
 .stat-card {
-    background-color: #ffffff;
+    background-color: var(--color-white);
     padding: 24px;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-card);
     text-align: center;
 }
 
 .stat-card h3 {
     font-size: 15px;
-    color: #6b7280;
+    color: var(--gray-500);
     margin-bottom: 12px;
 }
 
 .stat-card p {
     font-size: 30px;
     font-weight: bold;
-    color: #2563eb;
+    color: var(--color-primary);
     margin: 0;
 }
 
@@ -142,40 +209,40 @@ button {
 
 .dashboard-stats+p+form {
     max-width: 650px;
-    background-color: #ffffff;
+    background-color: var(--color-white);
     padding: 25px;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-card);
 }
 
 .dashboard-stats+p+form select {
     width: 100%;
     padding: 10px;
-    border: 1px solid #cccccc;
-    border-radius: 6px;
+    border: 1px solid var(--legacy-border);
+    border-radius: var(--radius-sm);
     box-sizing: border-box;
 }
 
 .dashboard-stats+p+form input {
-    border: 1px solid #cccccc;
-    border-radius: 6px;
+    border: 1px solid var(--legacy-border);
+    border-radius: var(--radius-sm);
 }
 
 .hero form[action="/dashboard"] {
     max-width: 650px;
-    background-color: #ffffff;
+    background-color: var(--color-white);
     padding: 25px;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-card);
 }
 
 .hero form[action="/dashboard"] select {
     width: 100%;
     padding: 10px;
-    border: 1px solid #cccccc;
-    border-radius: 6px;
+    border: 1px solid var(--legacy-border);
+    border-radius: var(--radius-sm);
     box-sizing: border-box;
 }
 
@@ -187,12 +254,12 @@ button {
 }
 
 .task-card {
-    background-color: #ffffff;
+    background-color: var(--color-white);
     padding: 20px;
     margin-bottom: 15px;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-card);
     text-align: left;
     line-height: 2;
 }
@@ -201,23 +268,23 @@ button {
     display: inline-block;
     padding: 7px 12px;
     margin: 5px 3px;
-    border-radius: 6px;
-    color: #ffffff;
+    border-radius: var(--radius-sm);
+    color: var(--color-white);
     text-decoration: none;
     font-size: 13px;
     font-weight: bold;
 }
 
 .task-button.edit {
-    background-color: #2563eb;
+    background-color: var(--color-primary);
 }
 
 .task-button.complete {
-    background-color: #15803d;
+    background-color: var(--color-success);
 }
 
 .task-button.delete {
-    background-color: #dc2626;
+    background-color: var(--color-danger);
 }
 
 .task-button:hover {
@@ -229,7 +296,7 @@ button {
     background-color: #dcfce7;
     color: #166534;
     padding: 7px 12px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     font-size: 13px;
     font-weight: bold;
     margin: 5px 3px;
@@ -260,8 +327,8 @@ button {
 .sidebar {
     width: 240px;
     min-width: 240px;
-    background-color: #111827;
-    color: #ffffff;
+    background-color: var(--color-navy);
+    color: var(--color-white);
     padding: 30px 20px;
     box-sizing: border-box;
     display: flex;
@@ -278,15 +345,15 @@ button {
 .sidebar-brand h1 {
     font-size: 24px;
     margin: 0;
-    color: #ffffff;
+    color: var(--color-white);
 }
 
 .brand-icon {
-    background-color: #2563eb;
-    color: #ffffff;
+    background-color: var(--color-primary);
+    color: var(--color-white);
     width: 38px;
     height: 38px;
-    border-radius: 10px;
+    border-radius: var(--radius-icon);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -298,7 +365,7 @@ button {
     font-size: 11px;
     font-weight: bold;
     letter-spacing: 1.5px;
-    color: #9ca3af;
+    color: var(--gray-400);
     margin: 0 0 15px 12px;
 }
 
@@ -310,22 +377,22 @@ button {
 
 .nav-link {
     display: block;
-    color: #cbd5e1;
+    color: var(--slate-300);
     text-decoration: none;
     padding: 13px 15px;
-    border-radius: 9px;
+    border-radius: var(--radius-control);
     font-size: 15px;
     font-weight: 500;
 }
 
 .nav-link:hover {
-    background-color: #374151;
-    color: #ffffff;
+    background-color: var(--gray-700);
+    color: var(--color-white);
 }
 
 .nav-link.active {
-    background-color: #2563eb;
-    color: #ffffff;
+    background-color: var(--color-primary);
+    color: var(--color-white);
 }
 
 .sidebar-footer {
@@ -337,24 +404,24 @@ button {
     flex: 1;
     min-width: 0;
     padding: 0;
-    background-color: #f8fafc;
+    background-color: var(--slate-50);
 }
 
 .dashboard-header {
-    background-color: #ffffff;
+    background-color: var(--color-white);
     padding: 28px 40px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .dashboard-header h2 {
     font-size: 25px;
     margin: 6px 0;
-    color: #111827;
+    color: var(--color-navy);
 }
 
 .dashboard-header p {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--gray-500);
     margin: 0;
 }
 
@@ -362,7 +429,7 @@ button {
     font-size: 11px;
     letter-spacing: 1.5px;
     font-weight: bold;
-    color: #2563eb;
+    color: var(--color-primary);
 }
 
 .main-content .hero {
@@ -416,17 +483,17 @@ button {
 .progress-bar {
     width: 100%;
     height: 9px;
-    background-color: #e5e7eb;
-    border-radius: 20px;
+    background-color: var(--gray-200);
+    border-radius: var(--radius-pill);
     overflow: hidden;
     margin-top: 14px;
 }
 
 .progress-fill {
     height: 100%;
-    background-color: #2563eb;
-    border-radius: 20px;
-    transition: width 0.3s ease;
+    background-color: var(--color-primary);
+    border-radius: var(--radius-pill);
+    transition: width var(--transition-medium);
 }
 
 .main-content .dashboard-stats {
@@ -454,10 +521,10 @@ button {
     max-width: 100%;
     margin: 20px 0 35px;
     padding: 24px;
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    background-color: var(--color-white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-card-soft);
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
     gap: 10px 18px;
@@ -468,7 +535,7 @@ button {
     margin: 0;
     font-size: 13px;
     font-weight: 600;
-    color: #374151;
+    color: var(--gray-700);
 }
 
 .add-task-form input,
@@ -477,9 +544,9 @@ button {
     min-width: 0;
     height: 42px;
     padding: 9px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    background-color: #ffffff;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    background-color: var(--color-white);
     box-sizing: border-box;
     font-size: 14px;
 }
@@ -487,15 +554,15 @@ button {
 .add-task-form .button {
     grid-column: 1 / -1;
     justify-self: start;
-    background-color: #2563eb;
-    color: #ffffff;
-    border-radius: 8px;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-radius: var(--radius-md);
     margin: 8px 0 0;
     font-weight: 600;
 }
 
 .add-task-form .button:hover {
-    background-color: #1d4ed8;
+    background-color: var(--color-primary-hover);
 }
 
 @media (max-width: 900px) {
@@ -632,7 +699,7 @@ button {
     margin: 0;
     font-size: 17px;
     font-weight: 600;
-    color: #111827;
+    color: var(--color-navy);
     overflow-wrap: anywhere;
 }
 
@@ -645,26 +712,26 @@ button {
 
 .task-meta .deadline {
     font-size: 13px;
-    color: #6b7280;
+    color: var(--gray-500);
 }
 
 .task-card-done {
-    background-color: #ffffff;
-    border-color: #e5e7eb;
+    background-color: var(--color-white);
+    border-color: var(--gray-200);
 }
 
 .task-card-done .task-title {
     text-decoration: line-through;
-    color: #9ca3af;
+    color: var(--gray-400);
 }
 
 .task-card-done .task-title {
     text-decoration: line-through;
-    color: #6b7280;
+    color: var(--gray-500);
 }
 
 .task-card .deadline.deadline-overdue {
-    color: #dc2626;
+    color: var(--color-danger);
     font-weight: 600;
     background-color: transparent;
     padding: 0;
@@ -686,15 +753,15 @@ button {
 }
 
 .task-button.edit {
-    color: #2563eb;
+    color: var(--color-primary);
 }
 
 .task-button.complete {
-    color: #15803d;
+    color: var(--color-success);
 }
 
 .task-button.delete {
-    color: #dc2626;
+    color: var(--color-danger);
 }
 
 .task-button.edit:hover,
@@ -715,15 +782,15 @@ button {
 }
 
 .priority-low {
-    color: #15803d;
+    color: var(--color-priority-low);
 }
 
 .priority-medium {
-    color: #a16207;
+    color: var(--color-priority-medium);
 }
 
 .priority-high {
-    color: #b91c1c;
+    color: var(--color-priority-high);
 }
 
 /* Deadline labels */
@@ -733,12 +800,12 @@ button {
     padding: 0;
     border-radius: 0;
     font-size: 13px;
-    color: #64748b;
+    color: var(--slate-500);
 }
 
 .deadline.deadline-overdue {
     background: transparent;
-    color: #dc2626;
+    color: var(--color-danger);
     padding: 0;
     border: none;
     border-radius: 0;
@@ -752,7 +819,7 @@ button {
     background-color: transparent;
     padding: 0;
     border-radius: 0;
-    color: #15803d;
+    color: var(--color-success);
     font-weight: 600;
 }
 
@@ -761,7 +828,7 @@ button {
 .task-card .priority-low,
 .task-card .priority-medium,
 .task-card .priority-high {
-    color: #64748b;
+    color: var(--slate-500);
 }
 
 /* ===== TASKFLOW: UNIFIED TASK METADATA ===== */
@@ -782,22 +849,22 @@ button {
 }
 
 .task-card .meta-label {
-    color: #64748b;
+    color: var(--slate-500);
     font-weight: 400;
 }
 
 .task-card .meta-value {
-    color: #334155;
+    color: var(--slate-700);
     font-weight: 600;
 }
 
 .task-card .meta-separator {
-    color: #cbd5e1;
+    color: var(--slate-300);
     font-size: 14px;
 }
 
 .task-card .task-overdue {
-    color: #dc2626;
+    color: var(--color-danger);
     font-size: 12px;
     font-weight: 600;
 }
@@ -812,15 +879,15 @@ button {
 /* Priority text colours only */
 
 .task-card .priority-value.priority-high {
-    color: #b91c1c;
+    color: var(--color-priority-high);
 }
 
 .task-card .priority-value.priority-medium {
-    color: #a16207;
+    color: var(--color-priority-medium);
 }
 
 .task-card .priority-value.priority-low {
-    color: #15803d;
+    color: var(--color-priority-low);
 }
 
 /* Priority: coloured text without backgrounds */
@@ -835,13 +902,13 @@ button {
 }
 
 .task-card .priority-value.priority-high {
-    color: #b91c1c;
+    color: var(--color-priority-high);
 }
 
 .task-card .priority-value.priority-medium {
-    color: #a16207;
+    color: var(--color-priority-medium);
 }
 
 .task-card .priority-value.priority-low {
-    color: #15803d;
+    color: var(--color-priority-low);
 }
