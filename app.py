@@ -1,3 +1,4 @@
+import calendar
 import sqlite3
 from datetime import date
 import os
@@ -381,6 +382,132 @@ def tasks():
         selected_status=status,
         selected_priority=priority,
         today=date.today().isoformat()
+    )
+
+
+# The calendar only shows years in this range. It keeps Python's calendar
+# module well away from its limits (December 9999 would need days in 10000).
+CALENDAR_FIRST_YEAR = 1900
+CALENDAR_LAST_YEAR = 2200
+
+
+def read_calendar_month(today):
+    # Read ?year=...&month=... from the URL. Anything missing, not a number or
+    # out of range falls back to the current month instead of causing an error.
+    try:
+        year = int(request.args["year"])
+        month = int(request.args["month"])
+    except (KeyError, ValueError):
+        return today.year, today.month
+
+    if not 1 <= month <= 12:
+        return today.year, today.month
+
+    if not CALENDAR_FIRST_YEAR <= year <= CALENDAR_LAST_YEAR:
+        return today.year, today.month
+
+    return year, month
+
+
+def task_status(task, today):
+    # The same rules as the Dashboard: completed tasks are completed, pending
+    # tasks with a deadline before today are overdue, and everything else
+    # (including tasks due today) is pending. Only called for tasks whose
+    # deadline is a real date, so comparing the YYYY-MM-DD text is safe.
+    if task["completed"] == 1:
+        return "completed"
+
+    if task["completed"] == 0 and task["deadline"] < today.isoformat():
+        return "overdue"
+
+    return "pending"
+
+
+@app.route("/calendar")
+def calendar_page():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    today = date.today()
+    year, month = read_calendar_month(today)
+
+    # Full Monday-to-Sunday weeks, including days from the months either side.
+    weeks = calendar.Calendar(firstweekday=0).monthdatescalendar(year, month)
+    first_shown = weeks[0][0]
+    last_shown = weeks[-1][-1]
+
+    connection = get_db_connection()
+
+    rows = connection.execute(
+        """
+        SELECT id, title, priority, deadline, completed FROM tasks
+        WHERE user_id = ?
+        AND date(deadline) = deadline
+        AND deadline BETWEEN ? AND ?
+        ORDER BY deadline ASC, completed ASC,
+            CASE priority WHEN 'High' THEN 0 WHEN 'Medium' THEN 1 ELSE 2 END,
+            id ASC
+        """,
+        (session["user_id"], first_shown.isoformat(), last_shown.isoformat())
+    ).fetchall()
+
+    # Tasks that cannot appear on any calendar: no deadline at all, or a
+    # deadline that is not a real date. They are counted separately.
+    deadline_counts = connection.execute(
+        """
+        SELECT
+            COALESCE(SUM(CASE WHEN deadline IS NULL OR deadline = ''
+                THEN 1 ELSE 0 END), 0) AS missing,
+            COALESCE(SUM(CASE WHEN deadline != '' AND date(deadline) IS NOT deadline
+                THEN 1 ELSE 0 END), 0) AS invalid
+        FROM tasks
+        WHERE user_id = ?
+        """,
+        (session["user_id"],)
+    ).fetchone()
+
+    connection.close()
+
+    tasks_by_day = {}
+
+    for row in rows:
+        task = dict(row, status=task_status(row, today))
+        tasks_by_day.setdefault(row["deadline"], []).append(task)
+
+    month_prefix = f"{year:04d}-{month:02d}-"
+    month_tasks = [
+        task
+        for day_tasks in tasks_by_day.values()
+        for task in day_tasks
+        if task["deadline"].startswith(month_prefix)
+    ]
+
+    previous_year, previous_month = (year - 1, 12) if month == 1 else (year, month - 1)
+    next_year, next_month = (year + 1, 1) if month == 12 else (year, month + 1)
+
+    return render_template(
+        "calendar.html",
+        weeks=weeks,
+        year=year,
+        month=month,
+        month_name=calendar.month_name[month],
+        month_start=date(year, month, 1),
+        today=today,
+        tasks_by_day=tasks_by_day,
+        has_visible_tasks=bool(rows),
+        month_total=len(month_tasks),
+        month_overdue=sum(1 for task in month_tasks if task["status"] == "overdue"),
+        month_completed=sum(1 for task in month_tasks if task["status"] == "completed"),
+        missing_deadlines=deadline_counts["missing"],
+        invalid_deadlines=deadline_counts["invalid"],
+        previous_link=(
+            url_for("calendar_page", year=previous_year, month=previous_month)
+            if previous_year >= CALENDAR_FIRST_YEAR else None
+        ),
+        next_link=(
+            url_for("calendar_page", year=next_year, month=next_month)
+            if next_year <= CALENDAR_LAST_YEAR else None
+        )
     )
 
 

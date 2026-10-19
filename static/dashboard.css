@@ -1,7 +1,7 @@
 /* ========================================
    TASKFLOW — APP STYLES
-   Signed-in pages only (Dashboard, My Tasks and Edit Task). Loaded by
-   app_base.html and uses the variables defined in style.css.
+   Signed-in pages only (Dashboard, My Tasks, Calendar and Edit Task).
+   Loaded by app_base.html and uses the variables defined in style.css.
 
    1. App layout
    2. Sidebar
@@ -13,7 +13,8 @@
    8. Task actions
    9. Empty state
    10. Edit task
-   11. Responsive
+   11. Calendar
+   12. Responsive
 ======================================== */
 
 
@@ -633,7 +634,238 @@
 
 
 /* ========================================
-   11. RESPONSIVE
+   11. CALENDAR
+   A table on wider screens; an agenda list on phones (see Responsive).
+======================================== */
+
+.calendar-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3) var(--space-4);
+}
+
+.calendar-title {
+    font-size: var(--text-xl);
+}
+
+.calendar-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.calendar-summary {
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+}
+
+.calendar-notes {
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+}
+
+.calendar-notes li + li {
+    margin-top: var(--space-1);
+}
+
+.calendar-notes a {
+    font-weight: 600;
+}
+
+.calendar-note-warning {
+    color: var(--color-danger);
+}
+
+.calendar-card {
+    margin-top: var(--space-5);
+    overflow: hidden;
+}
+
+.calendar-grid {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.calendar-grid th {
+    padding: var(--space-3) var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.calendar-day {
+    height: 120px;
+    padding: var(--space-2);
+    border-top: 1px solid var(--color-border);
+    border-left: 1px solid var(--color-border);
+    vertical-align: top;
+}
+
+.calendar-day:first-child {
+    border-left: none;
+}
+
+.calendar-grid tbody tr:first-child .calendar-day {
+    border-top: none;
+}
+
+/* Days from the months either side of the one being shown. */
+.calendar-day.is-outside {
+    background-color: var(--color-bg);
+}
+
+.calendar-day.is-outside .day-number {
+    color: var(--color-text-muted);
+    font-weight: 400;
+}
+
+.day-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.day-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    color: var(--color-heading);
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.calendar-day.is-today .day-number {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+/* Extra details (full date, month tags, priority) are read by screen readers
+   on wide screens and shown visibly in the phone agenda. */
+@media (min-width: 601px) {
+    .calendar-detail {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+}
+
+.calendar-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: var(--space-1) 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Long titles must never widen a day cell. */
+.calendar-task {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.calendar-task-link {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-1);
+    padding: 2px var(--space-1);
+    border-radius: var(--radius-sm);
+    color: var(--color-heading);
+    font-size: var(--text-sm);
+    text-decoration: none;
+}
+
+.calendar-task-link:hover {
+    background-color: var(--color-bg);
+    text-decoration: underline;
+}
+
+.calendar-task-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.status-marker {
+    flex-shrink: 0;
+    width: 1em;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Status: marker, colour and (for completed) strike-through together. */
+.status-pending .status-marker {
+    color: var(--color-primary);
+}
+
+.status-overdue .status-marker,
+.status-overdue .calendar-task-title {
+    color: var(--color-danger);
+}
+
+.status-completed .status-marker {
+    color: var(--color-success);
+}
+
+.status-completed .calendar-task-title {
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+}
+
+.calendar-more summary {
+    padding: 2px var(--space-1);
+    border-radius: var(--radius-sm);
+    color: var(--color-primary);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.calendar-empty {
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+    text-align: center;
+}
+
+.calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+}
+
+.legend-entry {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-1);
+}
+
+
+/* ========================================
+   12. RESPONSIVE
 ======================================== */
 
 @media (max-width: 1000px) {
@@ -760,5 +992,98 @@
 
     .chart-legend {
         justify-content: flex-start;
+    }
+
+    /* Three sidebar links must fit side by side on a phone. */
+    .sidebar-nav .nav-link {
+        gap: var(--space-2);
+        padding: 0 var(--space-2);
+    }
+
+    /* Calendar becomes an agenda: one block per day that has tasks. */
+    .calendar-grid,
+    .calendar-grid tbody,
+    .calendar-grid tr,
+    .calendar-day {
+        display: block;
+    }
+
+    .calendar-grid thead,
+    .calendar-day.is-empty,
+    .day-number {
+        display: none;
+    }
+
+    /* Every day has a top divider; shifting the list up 1px lets the card
+       clip the first one so it does not double up with the card border. */
+    .calendar-grid tbody {
+        margin-top: -1px;
+    }
+
+    .calendar-day,
+    .calendar-grid tbody tr:first-child .calendar-day {
+        height: auto;
+        padding: var(--space-4);
+        border-top: 1px solid var(--color-border);
+        border-left: none;
+    }
+
+    .day-full {
+        color: var(--color-heading);
+        font-weight: 600;
+    }
+
+    .calendar-day.is-outside .day-full {
+        color: var(--color-text-muted);
+    }
+
+    .day-tag {
+        font-size: var(--text-sm);
+        font-weight: 600;
+    }
+
+    .day-tag::before {
+        content: "· ";
+        color: var(--color-border-strong);
+    }
+
+    .day-tag-outside {
+        color: var(--color-text-muted);
+        font-style: italic;
+    }
+
+    .day-tag-today {
+        color: var(--color-primary);
+    }
+
+    .calendar-tasks {
+        gap: var(--space-1);
+        margin-top: var(--space-2);
+    }
+
+    .calendar-task-link {
+        flex-wrap: wrap;
+        padding: var(--space-1) 0;
+        font-size: var(--text-md);
+    }
+
+    .calendar-task-title {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .calendar-task-priority {
+        font-size: var(--text-sm);
+        font-weight: 600;
+    }
+
+    .calendar-task-priority::before {
+        content: "· ";
+        color: var(--color-border-strong);
+    }
+
+    .calendar-more summary {
+        padding: var(--space-2) 0;
+        font-size: var(--text-sm);
     }
 }

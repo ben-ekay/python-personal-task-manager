@@ -1,0 +1,150 @@
+{% extends "app_base.html" %}
+
+{% set active_page = "calendar" %}
+
+{% block title %}Calendar | TaskFlow{% endblock %}
+
+{% block page_header %}
+    <p class="header-label">My workspace</p>
+    <h1>Calendar</h1>
+    <p class="header-subtitle">See your tasks by their deadlines.</p>
+{% endblock %}
+
+{# One task inside a calendar day. Status is shown by a marker and as hidden
+   text for screen readers, so it never depends on colour alone. #}
+{% macro task_entry(task) %}
+    {% set labels = {"pending": "Pending", "overdue": "Overdue", "completed": "Completed"} %}
+    {% set markers = {"pending": "•", "overdue": "!", "completed": "✓"} %}
+    <li class="calendar-task status-{{ task.status }}">
+        <a href="{{ url_for('edit_task', task_id=task['id']) }}" class="calendar-task-link"
+            title="{{ task['title'] }} ({{ task['priority'] }} priority, {{ labels[task.status] | lower }})">
+            <span class="status-marker" aria-hidden="true">{{ markers[task.status] }}</span>
+            <span class="visually-hidden">{{ labels[task.status] }}: </span>
+            <span class="calendar-task-title">{{ task["title"] }}</span>
+            <span class="calendar-detail calendar-task-priority priority-value priority-{{ task['priority'] | lower }}">
+                <span class="visually-hidden">, </span>{{ task["priority"] }}<span class="visually-hidden"> priority</span>
+            </span>
+        </a>
+    </li>
+{% endmacro %}
+
+{% block page_content %}
+    <section class="page-section" aria-labelledby="month-heading">
+        <div class="calendar-header">
+            <h2 id="month-heading" class="calendar-title">{{ month_name }} {{ year }}</h2>
+
+            <nav class="calendar-nav" aria-label="Month navigation">
+                {% if previous_link %}
+                <a href="{{ previous_link }}" class="button secondary">
+                    <span aria-hidden="true">←</span> Previous<span class="visually-hidden"> month</span>
+                </a>
+                {% endif %}
+
+                <a href="{{ url_for('calendar_page') }}" class="button secondary">Today</a>
+
+                {% if next_link %}
+                <a href="{{ next_link }}" class="button secondary">
+                    Next<span class="visually-hidden"> month</span> <span aria-hidden="true">→</span>
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+
+        <p class="calendar-summary">
+            {{ month_total }} {{ "task" if month_total == 1 else "tasks" }} due in {{ month_name }}
+            · {{ month_overdue }} overdue · {{ month_completed }} completed
+        </p>
+
+        {% if missing_deadlines or invalid_deadlines %}
+        <ul class="calendar-notes">
+            {% if missing_deadlines %}
+            <li>
+                {{ missing_deadlines }} {{ "task has" if missing_deadlines == 1 else "tasks have" }} no deadline.
+                <a href="{{ url_for('tasks') }}">View in My Tasks</a>
+            </li>
+            {% endif %}
+
+            {% if invalid_deadlines %}
+            <li class="calendar-note-warning">
+                {{ invalid_deadlines }} {{ "task has" if invalid_deadlines == 1 else "tasks have" }}
+                an invalid deadline date and cannot be shown on the calendar.
+                <a href="{{ url_for('tasks') }}">Review in My Tasks</a>
+            </li>
+            {% endif %}
+        </ul>
+        {% endif %}
+
+        <div class="card calendar-card">
+            <table class="calendar-grid">
+                <caption class="visually-hidden">Tasks for {{ month_name }} {{ year }}</caption>
+
+                <thead>
+                    <tr>
+                        {% for day_name in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] %}
+                        <th scope="col">
+                            <span aria-hidden="true">{{ day_name[:3] }}</span>
+                            <span class="visually-hidden">{{ day_name }}</span>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for week in weeks %}
+                    <tr>
+                        {% for day in week %}
+                        {% set day_key = day.isoformat() %}
+                        {% set day_tasks = tasks_by_day.get(day_key, []) %}
+                        {% set outside = day.month != month %}
+                        <td class="calendar-day{% if outside %} is-outside{% endif %}{% if day == today %} is-today{% endif %}{% if not day_tasks %} is-empty{% endif %}"
+                            {% if day == today %}aria-current="date"{% endif %}>
+                            <div class="day-heading">
+                                <time class="day-number" datetime="{{ day_key }}" aria-hidden="true">{{ day.day }}</time>
+                                <span class="calendar-detail day-full">{{ day.strftime("%A") }} {{ day.day }} {{ day.strftime("%B") }}</span>
+                                {% if outside %}
+                                <span class="calendar-detail day-tag day-tag-outside">{{ "Previous month" if day < month_start else "Next month" }}</span>
+                                {% endif %}
+                                {% if day == today %}
+                                <span class="calendar-detail day-tag day-tag-today">Today</span>
+                                {% endif %}
+                            </div>
+
+                            {% if day_tasks %}
+                            <ul class="calendar-tasks">
+                                {% for task in day_tasks[:3] %}
+                                {{ task_entry(task) }}
+                                {% endfor %}
+                            </ul>
+
+                            {% if day_tasks | length > 3 %}
+                            <details class="calendar-more">
+                                <summary>
+                                    + {{ day_tasks | length - 3 }} more<span class="visually-hidden"> on {{ day.day }} {{ day.strftime("%B") }}</span>
+                                </summary>
+                                <ul class="calendar-tasks">
+                                    {% for task in day_tasks[3:] %}
+                                    {{ task_entry(task) }}
+                                    {% endfor %}
+                                </ul>
+                            </details>
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if not has_visible_tasks %}
+            <p class="calendar-empty">No tasks with deadlines in this period.</p>
+            {% endif %}
+        </div>
+
+        <p class="calendar-legend">
+            <span class="legend-entry status-pending"><span class="status-marker" aria-hidden="true">•</span>Pending</span>
+            <span class="legend-entry status-overdue"><span class="status-marker" aria-hidden="true">!</span>Overdue</span>
+            <span class="legend-entry status-completed"><span class="status-marker" aria-hidden="true">✓</span>Completed</span>
+        </p>
+    </section>
+{% endblock %}
