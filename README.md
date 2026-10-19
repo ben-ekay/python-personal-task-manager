@@ -74,13 +74,35 @@ Selecting a task on the dashboard opens it for editing.
 
 ## Screenshots
 
-Screenshots will be added at a later stage. The planned screenshots are:
+### Dashboard
 
-- Dashboard
-- My Tasks
-- Calendar
-- Edit Task
-- The mobile layout
+![TaskFlow dashboard with task statistics, a priority breakdown chart, upcoming deadlines and overdue tasks](docs/screenshots/dashboard.png)
+
+The dashboard shows task statistics, a breakdown of tasks by priority, upcoming deadlines and any overdue tasks.
+
+### My Tasks
+
+![My Tasks page with the add task form, status and priority filters, and the task list](docs/screenshots/my-tasks.png)
+
+My Tasks is where tasks are added, filtered, completed, edited and deleted. Completed tasks are crossed out and can be undone.
+
+### Calendar
+
+![Monthly calendar for October 2026 showing tasks on their deadlines](docs/screenshots/calendar.png)
+
+The calendar shows each task on its deadline. Today's date is highlighted, and symbols show whether a task is pending, overdue or completed.
+
+### Edit Task
+
+![Edit Task form with title, priority and deadline fields and a No deadline option](docs/screenshots/edit-task.png)
+
+A task's title, priority and deadline can be changed, or the deadline removed with the "No deadline" option.
+
+### Mobile layout
+
+<img src="docs/screenshots/mobile-layout.png" alt="TaskFlow My Tasks page on a phone-sized screen, with the navigation shown as a top bar" width="320">
+
+On a phone-sized screen, the sidebar becomes a top bar with the navigation links and Log out, and the content is arranged in a single column.
 
 ## Technologies
 
