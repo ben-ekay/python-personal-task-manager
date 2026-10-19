@@ -136,7 +136,7 @@
 
                     {% if task["completed"] == 0 %}
                     <form method="POST" action="{{ url_for('complete_task', task_id=task['id']) }}"
-                        class="task-action-form">
+                        class="task-action-form" data-preserve-scroll>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="status" value="{{ selected_status }}">
                         <input type="hidden" name="priority" value="{{ selected_priority }}">
@@ -149,7 +149,7 @@
                     <span class="completed-badge">✓ Completed</span>
 
                     <form method="POST" action="{{ url_for('undo_task', task_id=task['id']) }}"
-                        class="task-action-form">
+                        class="task-action-form" data-preserve-scroll>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="status" value="{{ selected_status }}">
                         <input type="hidden" name="priority" value="{{ selected_priority }}">
@@ -179,4 +179,8 @@
         </div>
         {% endif %}
     </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='preserve-scroll.js') }}"></script>
 {% endblock %}
