@@ -16,7 +16,8 @@
     {% set labels = {"pending": "Pending", "overdue": "Overdue", "completed": "Completed"} %}
     {% set markers = {"pending": "•", "overdue": "!", "completed": "✓"} %}
     <li class="calendar-task status-{{ task.status }}">
-        <a href="{{ url_for('edit_task', task_id=task['id']) }}" class="calendar-task-link"
+        <a href="{{ url_for('edit_task', task_id=task['id'], return_to='calendar', return_year=year, return_month=month) }}"
+            class="calendar-task-link"
             title="{{ task['title'] }} ({{ task['priority'] }} priority, {{ labels[task.status] | lower }})">
             <span class="status-marker" aria-hidden="true">{{ markers[task.status] }}</span>
             <span class="visually-hidden">{{ labels[task.status] }}: </span>

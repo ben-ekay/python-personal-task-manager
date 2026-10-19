@@ -93,7 +93,7 @@
             <ul class="deadline-list">
                 {% for task in upcoming_tasks %}
                 <li class="deadline-item">
-                    <a href="{{ url_for('edit_task', task_id=task['id']) }}" class="deadline-title">
+                    <a href="{{ url_for('edit_task', task_id=task['id'], return_to='dashboard') }}" class="deadline-title">
                         <span class="visually-hidden">Edit task: </span>{{ task["title"] }}
                     </a>
 
@@ -123,7 +123,7 @@
             <ul class="deadline-list">
                 {% for task in overdue_list %}
                 <li class="deadline-item">
-                    <a href="{{ url_for('edit_task', task_id=task['id']) }}" class="deadline-title">
+                    <a href="{{ url_for('edit_task', task_id=task['id'], return_to='dashboard') }}" class="deadline-title">
                         <span class="visually-hidden">Edit task: </span>{{ task["title"] }}
                     </a>
 

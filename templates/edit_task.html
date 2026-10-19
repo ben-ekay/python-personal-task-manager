@@ -1,30 +1,80 @@
 {% extends "app_base.html" %}
 
-{% set active_page = "tasks" %}
+{# Highlight the sidebar page the user came from. #}
+{% set active_page = back.page %}
 
 {% block title %}Edit Task | TaskFlow{% endblock %}
 
 {% block page_header %}
-    <p class="header-label">My tasks</p>
+    <p class="header-label">{{ {"tasks": "My tasks", "calendar": "Calendar", "dashboard": "Dashboard"}[back.page] }}</p>
     <h1>Edit task</h1>
-    <p class="header-subtitle">Update the title of your task, then save your changes.</p>
+    <p class="header-subtitle">Update the title, priority or deadline, then save your changes.</p>
 {% endblock %}
 
 {% block page_content %}
     <section class="card edit-card" aria-labelledby="edit-heading">
         <h2 id="edit-heading" class="card-title">Task details</h2>
 
-        <form method="POST" class="edit-form">
+        {% if errors %}
+        <div class="form-errors" role="alert">
+            <p class="form-errors-title">Your changes were not saved. Please check:</p>
+            <ul>
+                {% for message in errors.values() %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if invalid_saved_deadline %}
+        <p class="form-warning" id="saved-deadline-warning">
+            The saved deadline “{{ invalid_saved_deadline }}” is not a valid date.
+            Choose a new date or tick <strong>No deadline</strong>.
+        </p>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('edit_task', task_id=task['id']) }}" class="edit-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            {# Where to go after saving; the server checks these values again. #}
+            {% for name, value in back.fields.items() %}
+            <input type="hidden" name="{{ name }}" value="{{ value }}">
+            {% endfor %}
 
             <div class="form-field">
                 <label for="title">Task title</label>
-                <input type="text" id="title" name="title" value="{{ task['title'] }}" required>
+                <input type="text" id="title" name="title" value="{{ form.title }}" maxlength="100" required
+                    {% if errors.title %}aria-invalid="true"{% endif %}>
+            </div>
+
+            <div class="edit-form-row">
+                <div class="form-field">
+                    <label for="priority">Priority</label>
+                    <select id="priority" name="priority" {% if errors.priority %}aria-invalid="true"{% endif %}>
+                        {% for option in ["Low", "Medium", "High"] %}
+                        <option value="{{ option }}" {% if form.priority == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="deadline">Deadline</label>
+                    <input type="date" id="deadline" name="deadline" value="{{ form.deadline }}"
+                        min="1900-01-01" max="2200-12-31"
+                        {% if errors.deadline %}aria-invalid="true"{% endif %}
+                        {% if invalid_saved_deadline %}aria-describedby="saved-deadline-warning"{% endif %}>
+
+                    <div class="checkbox-field">
+                        <input type="checkbox" id="no_deadline" name="no_deadline" value="1"
+                            {% if form.no_deadline %}checked{% endif %}>
+                        <label for="no_deadline">No deadline</label>
+                    </div>
+                </div>
             </div>
 
             <div class="form-actions">
                 <button type="submit" class="button">Save changes</button>
-                <a href="{{ url_for('tasks') }}" class="button secondary">Cancel</a>
+                <a href="{{ back.url }}" class="button secondary">Cancel</a>
             </div>
         </form>
     </section>

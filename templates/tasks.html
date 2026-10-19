@@ -19,7 +19,7 @@
 
             <div class="form-field">
                 <label for="title">Task title</label>
-                <input type="text" id="title" name="title" placeholder="What do you need to do?" required>
+                <input type="text" id="title" name="title" placeholder="What do you need to do?" maxlength="100" required>
             </div>
 
             <div class="form-field">
@@ -99,7 +99,8 @@
                 </div>
 
                 <div class="task-actions">
-                    <a href="{{ url_for('edit_task', task_id=task['id']) }}" class="task-button edit">
+                    <a href="{{ url_for('edit_task', task_id=task['id'], return_to='tasks', return_status=selected_status, return_priority=selected_priority) }}"
+                        class="task-button edit">
                         Edit<span class="visually-hidden"> task: {{ task["title"] }}</span>
                     </a>
 

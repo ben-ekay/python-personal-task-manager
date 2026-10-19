@@ -160,6 +160,127 @@ def login():
 
 PRIORITIES = ["High", "Medium", "Low"]
 
+# The calendar only shows years in this range, and deadlines must fall inside
+# it. It keeps Python's calendar module well away from its limits (December
+# 9999 would need days in the year 10000).
+CALENDAR_FIRST_YEAR = 1900
+CALENDAR_LAST_YEAR = 2200
+
+
+def is_valid_deadline(value):
+    # A real calendar date written exactly as YYYY-MM-DD, within the years the
+    # calendar can show. Python 3.11+ also reads forms such as 20261019, so the
+    # parsed date must turn back into exactly the same text.
+    try:
+        parsed = date.fromisoformat(value)
+    except (TypeError, ValueError):
+        return False
+
+    if parsed.isoformat() != value:
+        return False
+
+    return CALENDAR_FIRST_YEAR <= parsed.year <= CALENDAR_LAST_YEAR
+
+
+def validate_task_fields(form):
+    # Check the title, priority and deadline sent by the Add or Edit form.
+    # Returns the cleaned values and a dictionary of error messages by field.
+    title = form.get("title", "").strip()
+    priority = form.get("priority", "")
+    deadline = form.get("deadline", "").strip()
+
+    # The "No deadline" checkbox always wins, so clearing works in every browser.
+    if form.get("no_deadline"):
+        deadline = ""
+
+    errors = {}
+
+    if not title or len(title) > 100:
+        errors["title"] = "Task title must contain between 1 and 100 characters."
+
+    if priority not in PRIORITIES:
+        errors["priority"] = "Please choose a valid priority."
+
+    if deadline and not is_valid_deadline(deadline):
+        errors["deadline"] = (
+            f"Please enter a real date between {CALENDAR_FIRST_YEAR} "
+            f"and {CALENDAR_LAST_YEAR}, or leave the deadline empty."
+        )
+
+    values = {"title": title, "priority": priority, "deadline": deadline}
+
+    return values, errors
+
+
+def task_filters(source):
+    # My Tasks filters from a form or URL. Only known values are passed on,
+    # so nothing else can be injected into a redirect.
+    filters = {}
+
+    status = source.get("status")
+    priority = source.get("priority")
+
+    if status in ["pending", "completed"]:
+        filters["status"] = status
+
+    if priority in PRIORITIES:
+        filters["priority"] = priority
+
+    return filters
+
+
+def calendar_month_params(source):
+    # {"year": ..., "month": ...} when both are whole numbers in range,
+    # otherwise an empty dictionary.
+    try:
+        year = int(source.get("year"))
+        month = int(source.get("month"))
+    except (TypeError, ValueError):
+        return {}
+
+    if not 1 <= month <= 12:
+        return {}
+
+    if not CALENDAR_FIRST_YEAR <= year <= CALENDAR_LAST_YEAR:
+        return {}
+
+    return {"year": year, "month": month}
+
+
+def return_target(source):
+    # Where Save and Cancel on the Edit page lead. return_to is a page name
+    # from a fixed list, never a web address, and every extra value is checked
+    # again here. url_for() builds the address, so it always stays in TaskFlow.
+    page = source.get("return_to")
+
+    if page == "calendar":
+        params = calendar_month_params({
+            "year": source.get("return_year"),
+            "month": source.get("return_month")
+        })
+        url = url_for("calendar_page", **params)
+
+    elif page == "dashboard":
+        params = {}
+        url = url_for("dashboard")
+
+    else:
+        page = "tasks"
+        params = task_filters({
+            "status": source.get("return_status"),
+            "priority": source.get("return_priority")
+        })
+        url = url_for("tasks", **params)
+
+    # Hidden fields that carry the same, already checked, values through Save.
+    fields = {"return_to": page}
+
+    for name, value in params.items():
+        fields["return_" + name] = value
+
+    return {"page": page, "url": url, "fields": fields}
+
+
 
 def describe_deadline(deadline, today):
     # Turn a stored deadline into a short label such as "Due tomorrow".
@@ -326,13 +447,10 @@ def tasks():
         return redirect(url_for("login"))
 
     if request.method == "POST":
-        title = request.form["title"].strip()
+        values, errors = validate_task_fields(request.form)
 
-        if not title or len(title) > 100:
-            return "Task title must contain between 1 and 100 characters.", 400
-
-        priority = request.form["priority"]
-        deadline = request.form["deadline"]
+        if errors:
+            return " ".join(errors.values()), 400
 
         connection = get_db_connection()
 
@@ -341,7 +459,7 @@ def tasks():
             INSERT INTO tasks (user_id, title, priority, deadline)
             VALUES (?, ?, ?, ?)
             """,
-            (session["user_id"], title, priority, deadline)
+            (session["user_id"], values["title"], values["priority"], values["deadline"])
         )
 
         connection.commit()
@@ -385,28 +503,15 @@ def tasks():
     )
 
 
-# The calendar only shows years in this range. It keeps Python's calendar
-# module well away from its limits (December 9999 would need days in 10000).
-CALENDAR_FIRST_YEAR = 1900
-CALENDAR_LAST_YEAR = 2200
-
-
 def read_calendar_month(today):
     # Read ?year=...&month=... from the URL. Anything missing, not a number or
     # out of range falls back to the current month instead of causing an error.
-    try:
-        year = int(request.args["year"])
-        month = int(request.args["month"])
-    except (KeyError, ValueError):
+    params = calendar_month_params(request.args)
+
+    if not params:
         return today.year, today.month
 
-    if not 1 <= month <= 12:
-        return today.year, today.month
-
-    if not CALENDAR_FIRST_YEAR <= year <= CALENDAR_LAST_YEAR:
-        return today.year, today.month
-
-    return year, month
+    return params["year"], params["month"]
 
 
 def task_status(task, today):
@@ -513,19 +618,7 @@ def calendar_page():
 
 def redirect_to_tasks():
     # Return to My Tasks with the filters the user had applied.
-    # Only known values are passed on, so the form cannot inject anything else.
-    filters = {}
-
-    status = request.form.get("status")
-    priority = request.form.get("priority")
-
-    if status in ["pending", "completed"]:
-        filters["status"] = status
-
-    if priority in ["Low", "Medium", "High"]:
-        filters["priority"] = priority
-
-    return redirect(url_for("tasks", **filters))
+    return redirect(url_for("tasks", **task_filters(request.form)))
 
 
 @app.route("/complete/<int:task_id>", methods=["POST"])
@@ -591,28 +684,62 @@ def edit_task(task_id):
         connection.close()
         return "Task not found", 404
 
-    if request.method == "POST":
-        title = request.form["title"]
+    # Links to this page say where they came from in the URL; the form
+    # carries the same (re-checked) values through Save.
+    back = return_target(request.form if request.method == "POST" else request.args)
 
+    # A saved deadline that is not a real date is shown as a warning rather
+    # than being put into the date field, which could not display it.
+    saved_deadline = task["deadline"] or ""
+    invalid_saved_deadline = (
+        saved_deadline if saved_deadline and not is_valid_deadline(saved_deadline) else ""
+    )
+
+    if request.method == "POST":
+        values, errors = validate_task_fields(request.form)
+
+        if errors:
+            connection.close()
+
+            return render_template(
+                "edit_task.html",
+                task=task,
+                form=dict(values, no_deadline=bool(request.form.get("no_deadline"))),
+                errors=errors,
+                back=back,
+                invalid_saved_deadline=invalid_saved_deadline
+            ), 400
+
+        # Only these three fields can change; completed and user_id cannot.
         connection.execute(
             """
             UPDATE tasks
-            SET title = ?
+            SET title = ?, priority = ?, deadline = ?
             WHERE id = ? AND user_id = ?
             """,
-            (title, task_id, session["user_id"])
+            (values["title"], values["priority"], values["deadline"],
+             task_id, session["user_id"])
         )
 
         connection.commit()
         connection.close()
 
-        return redirect(url_for("tasks"))
+        return redirect(back["url"])
 
     connection.close()
 
     return render_template(
         "edit_task.html",
-        task=task
+        task=task,
+        form={
+            "title": task["title"],
+            "priority": task["priority"],
+            "deadline": "" if invalid_saved_deadline else saved_deadline,
+            "no_deadline": False
+        },
+        errors={},
+        back=back,
+        invalid_saved_deadline=invalid_saved_deadline
     )
 
     
