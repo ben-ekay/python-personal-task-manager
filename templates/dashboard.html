@@ -31,6 +31,11 @@
             </div>
 
             <div class="card stat-card">
+                <h3>Overdue</h3>
+                <p class="stat-value{% if overdue_tasks > 0 %} stat-value-alert{% endif %}">{{ overdue_tasks }}</p>
+            </div>
+
+            <div class="card stat-card">
                 <h3>Progress</h3>
                 <p class="stat-value">{{ completion_percentage }}%</p>
 
@@ -42,9 +47,111 @@
         </div>
     </section>
 
-    <section class="page-section" aria-labelledby="manage-heading">
-        <h2 id="manage-heading" class="section-title">Manage your tasks</h2>
+    <section class="page-section" aria-labelledby="priority-heading">
+        <h2 id="priority-heading" class="section-title">Priority breakdown</h2>
 
-        <a href="{{ url_for('tasks') }}" class="button">Go to My Tasks</a>
+        <div class="card chart-card">
+            {% if total_tasks > 0 %}
+            {# Each row states its numbers as text; the bars are a visual summary only. #}
+            <ul class="chart-list">
+                {% for row in priority_breakdown %}
+                <li class="chart-row">
+                    <span class="chart-label priority-value priority-{{ row.name | lower }}">{{ row.name }}</span>
+
+                    <div class="chart-track" aria-hidden="true">
+                        <div class="chart-bar" style="width: {{ row.bar_width }}%;">
+                            <div class="chart-bar-done" style="width: {{ row.completed_width }}%;"></div>
+                        </div>
+                    </div>
+
+                    <span class="chart-numbers">
+                        {{ row.total }} {{ "task" if row.total == 1 else "tasks" }}
+                        · {{ row.completed }} done · {{ row.pending }} to do
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <p class="chart-legend" aria-hidden="true">
+                <span class="legend-item"><span class="legend-swatch legend-done"></span>Completed</span>
+                <span class="legend-item"><span class="legend-swatch legend-pending"></span>Pending</span>
+            </p>
+            {% else %}
+            <p class="dashboard-empty">
+                You have no tasks yet. <a href="{{ url_for('tasks') }}">Add your first task</a>
+                to see your priority breakdown.
+            </p>
+            {% endif %}
+        </div>
     </section>
+
+    <div class="page-section deadline-grid">
+        <section class="card deadline-card" aria-labelledby="upcoming-heading">
+            <h2 id="upcoming-heading" class="card-title">Upcoming deadlines</h2>
+
+            {% if upcoming_tasks %}
+            <ul class="deadline-list">
+                {% for task in upcoming_tasks %}
+                <li class="deadline-item">
+                    <a href="{{ url_for('edit_task', task_id=task['id']) }}" class="deadline-title">
+                        <span class="visually-hidden">Edit task: </span>{{ task["title"] }}
+                    </a>
+
+                    <div class="task-meta">
+                        <span class="priority-value priority-{{ task['priority'] | lower }}">{{ task["priority"] }}</span>
+                        <span class="meta-separator" aria-hidden="true">·</span>
+                        <time class="meta-value" datetime="{{ task['deadline'] }}">
+                            {{ task["deadline"][8:10] }}/{{ task["deadline"][5:7] }}/{{ task["deadline"][0:4] }}
+                        </time>
+                        {% if task["deadline_label"] %}
+                        <span class="meta-separator" aria-hidden="true">·</span>
+                        <span class="meta-label">{{ task["deadline_label"] }}</span>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="dashboard-empty">No upcoming deadlines.</p>
+            {% endif %}
+        </section>
+
+        <section class="card deadline-card" aria-labelledby="overdue-heading">
+            <h2 id="overdue-heading" class="card-title">Overdue tasks</h2>
+
+            {% if overdue_list %}
+            <ul class="deadline-list">
+                {% for task in overdue_list %}
+                <li class="deadline-item">
+                    <a href="{{ url_for('edit_task', task_id=task['id']) }}" class="deadline-title">
+                        <span class="visually-hidden">Edit task: </span>{{ task["title"] }}
+                    </a>
+
+                    <div class="task-meta">
+                        <span class="priority-value priority-{{ task['priority'] | lower }}">{{ task["priority"] }}</span>
+                        <span class="meta-separator" aria-hidden="true">·</span>
+                        <time class="meta-value" datetime="{{ task['deadline'] }}">
+                            {{ task["deadline"][8:10] }}/{{ task["deadline"][5:7] }}/{{ task["deadline"][0:4] }}
+                        </time>
+                        {% if task["deadline_label"] %}
+                        <span class="meta-separator" aria-hidden="true">·</span>
+                        <span class="task-overdue">{{ task["deadline_label"] }}</span>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+
+            {% if more_overdue > 0 %}
+            <p class="deadline-more">
+                <a href="{{ url_for('tasks', status='pending') }}">
+                    + {{ more_overdue }} more overdue {{ "task" if more_overdue == 1 else "tasks" }}
+                </a>
+            </p>
+            {% endif %}
+            {% else %}
+            <p class="dashboard-empty">Nothing overdue. Nice work!</p>
+            {% endif %}
+        </section>
+    </div>
 {% endblock %}

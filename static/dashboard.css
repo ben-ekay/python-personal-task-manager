@@ -6,7 +6,7 @@
    1. App layout
    2. Sidebar
    3. Page header and sections
-   4. Statistics and progress
+   4. Dashboard analytics (statistics, priority chart, deadlines)
    5. Add task and filter forms
    6. Task list
    7. Task details and priority
@@ -188,12 +188,16 @@
 
 
 /* ========================================
-   4. STATISTICS AND PROGRESS
+   4. DASHBOARD ANALYTICS
 ======================================== */
 
+/* --- Statistics --- */
+
+/* Cards wrap to fit the space: five across on wide screens,
+   fewer on narrower ones, never narrower than 160px. */
 .dashboard-stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: var(--space-4);
 }
 
@@ -218,6 +222,10 @@
     letter-spacing: -0.02em;
 }
 
+.stat-value-alert {
+    color: var(--color-danger);
+}
+
 .progress-bar {
     height: 8px;
     margin-top: var(--space-3);
@@ -231,6 +239,165 @@
     background-color: var(--color-primary);
     border-radius: var(--radius-full);
     transition: width var(--transition-medium);
+}
+
+/* --- Priority chart ---
+   Bar widths are percentages calculated in app.py. Bars are blue; the
+   priority names carry the priority colour as text. */
+
+.chart-card {
+    padding: var(--space-6);
+}
+
+.chart-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.chart-row {
+    display: grid;
+    grid-template-columns: 72px 1fr minmax(190px, auto);
+    grid-template-areas: "label track numbers";
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.chart-label {
+    grid-area: label;
+    font-size: var(--text-md);
+    font-weight: 600;
+}
+
+.chart-track {
+    grid-area: track;
+    height: 12px;
+    overflow: hidden;
+    background-color: var(--color-bg);
+    border-radius: var(--radius-full);
+    box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+.chart-bar {
+    height: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    transition: width var(--transition-medium);
+}
+
+/* Light blue for pending work. The first line is a fallback for browsers
+   without color-mix(). */
+.chart-bar,
+.legend-pending {
+    background-color: var(--color-border-strong);
+    background-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-white));
+}
+
+.chart-bar-done,
+.legend-done {
+    background-color: var(--color-primary);
+}
+
+.chart-bar-done {
+    height: 100%;
+}
+
+.chart-numbers {
+    grid-area: numbers;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    text-align: right;
+    white-space: nowrap;
+}
+
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-4);
+    margin-top: var(--space-5);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.legend-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: var(--radius-sm);
+}
+
+/* --- Deadline lists --- */
+
+.deadline-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+    gap: var(--space-4);
+}
+
+.deadline-card {
+    padding: var(--space-6);
+}
+
+.deadline-list {
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.deadline-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--color-border);
+}
+
+.deadline-item:first-child {
+    padding-top: 0;
+    border-top: none;
+}
+
+.deadline-title {
+    color: var(--color-heading);
+    font-weight: 600;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.deadline-title:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+.deadline-more {
+    margin-top: var(--space-1);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
+    font-size: var(--text-md);
+}
+
+.deadline-more a {
+    font-weight: 600;
+}
+
+.dashboard-empty {
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+}
+
+.card-title + .dashboard-empty {
+    margin-top: var(--space-4);
 }
 
 
@@ -538,8 +705,11 @@
     }
 
     .dashboard-stats {
-        grid-template-columns: repeat(2, 1fr);
         gap: var(--space-3);
+    }
+
+    .deadline-grid {
+        grid-template-columns: 1fr;
     }
 
     .filter-form {
@@ -566,7 +736,29 @@
         margin-left: calc(-1 * var(--space-3));
     }
 
+    /* Two stat cards per row; the fifth (Progress) spans the full width. */
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-stats .stat-card:last-child {
+        grid-column: 1 / -1;
+    }
+
     .stat-value {
         font-size: var(--text-xl);
+    }
+
+    /* Chart rows: name and numbers on one line, the bar underneath. */
+    .chart-row {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "label numbers"
+            "track track";
+        gap: var(--space-2) var(--space-3);
+    }
+
+    .chart-legend {
+        justify-content: flex-start;
     }
 }
