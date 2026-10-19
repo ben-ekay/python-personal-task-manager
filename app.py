@@ -157,8 +157,52 @@ def login():
 
     return render_template("login.html")
 
-@app.route("/dashboard", methods=["GET", "POST"])
+@app.route("/dashboard")
 def dashboard():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    connection = get_db_connection()
+
+    total_tasks = connection.execute(
+        """
+        SELECT COUNT(*) FROM tasks
+        WHERE user_id = ?
+        """,
+        (session["user_id"],)
+    ).fetchone()[0]
+
+    completed_tasks = connection.execute(
+        """
+        SELECT COUNT(*) FROM tasks
+        WHERE user_id = ? AND completed = 1
+        """,
+        (session["user_id"],)
+    ).fetchone()[0]
+
+    pending_tasks = total_tasks - completed_tasks
+
+    if total_tasks > 0:
+        completion_percentage = round(
+            (completed_tasks / total_tasks) * 100,
+            1
+        )
+    else:
+        completion_percentage = 0
+
+    connection.close()
+
+    return render_template(
+        "dashboard.html",
+        total_tasks=total_tasks,
+        completed_tasks=completed_tasks,
+        pending_tasks=pending_tasks,
+        completion_percentage=completion_percentage
+    )
+
+
+@app.route("/tasks", methods=["GET", "POST"])
+def tasks():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
@@ -184,7 +228,7 @@ def dashboard():
         connection.commit()
         connection.close()
 
-        return redirect(url_for("dashboard"))
+        return redirect(url_for("tasks"))
 
     connection = get_db_connection()
 
@@ -206,54 +250,24 @@ def dashboard():
 
     query += " ORDER BY id DESC"
 
-    tasks = connection.execute(
+    user_tasks = connection.execute(
         query,
         parameters
     ).fetchall()
 
-    total_tasks = connection.execute(
-        """
-        SELECT COUNT(*) FROM tasks
-        WHERE user_id = ?
-        """,
-        (session["user_id"],)
-    ).fetchone()[0]
-    
-    completed_tasks = connection.execute(
-        """
-        SELECT COUNT(*) FROM tasks
-        WHERE user_id = ? AND completed = 1
-        """,
-        (session["user_id"],)
-    ).fetchone()[0]
-
-    pending_tasks = total_tasks - completed_tasks
-    
-    if total_tasks > 0:
-        completion_percentage = round(
-            (completed_tasks / total_tasks) * 100,
-            1
-        )
-    else:
-        completion_percentage = 0
-
     connection.close()
 
     return render_template(
-        "dashboard.html",
-        tasks=tasks,
+        "tasks.html",
+        tasks=user_tasks,
         selected_status=status,
         selected_priority=priority,
-        total_tasks=total_tasks,
-        completed_tasks=completed_tasks,
-        pending_tasks=pending_tasks,
-        completion_percentage=completion_percentage,
         today=date.today().isoformat()
     )
 
 
-def redirect_to_dashboard():
-    # Return to the dashboard with the filters the user had applied.
+def redirect_to_tasks():
+    # Return to My Tasks with the filters the user had applied.
     # Only known values are passed on, so the form cannot inject anything else.
     filters = {}
 
@@ -266,7 +280,7 @@ def redirect_to_dashboard():
     if priority in ["Low", "Medium", "High"]:
         filters["priority"] = priority
 
-    return redirect(url_for("dashboard", **filters))
+    return redirect(url_for("tasks", **filters))
 
 
 @app.route("/complete/<int:task_id>", methods=["POST"])
@@ -288,7 +302,7 @@ def complete_task(task_id):
     connection.commit()
     connection.close()
 
-    return redirect_to_dashboard()
+    return redirect_to_tasks()
 
 
 @app.route("/undo/<int:task_id>", methods=["POST"])
@@ -310,7 +324,7 @@ def undo_task(task_id):
     connection.commit()
     connection.close()
 
-    return redirect_to_dashboard()
+    return redirect_to_tasks()
 
 
 @app.route("/edit/<int:task_id>", methods=["GET", "POST"])
@@ -347,7 +361,7 @@ def edit_task(task_id):
         connection.commit()
         connection.close()
 
-        return redirect(url_for("dashboard"))
+        return redirect(url_for("tasks"))
 
     connection.close()
 
@@ -375,7 +389,7 @@ def delete_task(task_id):
     connection.commit()
     connection.close()
 
-    return redirect(url_for("dashboard"))
+    return redirect_to_tasks()
 
 @app.route("/logout")
 def logout():

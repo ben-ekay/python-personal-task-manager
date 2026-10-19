@@ -1,0 +1,157 @@
+{% extends "app_base.html" %}
+
+{% set active_page = "tasks" %}
+
+{% block title %}My Tasks | TaskFlow{% endblock %}
+
+{% block page_header %}
+    <p class="header-label">My workspace</p>
+    <h1>My tasks</h1>
+    <p class="header-subtitle">Add, filter and update your tasks.</p>
+{% endblock %}
+
+{% block page_content %}
+    <section class="page-section" aria-labelledby="add-task-heading">
+        <h2 id="add-task-heading" class="section-title">Add a task</h2>
+
+        <form method="POST" action="{{ url_for('tasks') }}" class="card add-task-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-field">
+                <label for="title">Task title</label>
+                <input type="text" id="title" name="title" placeholder="What do you need to do?" required>
+            </div>
+
+            <div class="form-field">
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="deadline">Deadline</label>
+                <input type="date" id="deadline" name="deadline">
+            </div>
+
+            <button type="submit" class="button">Add task</button>
+        </form>
+    </section>
+
+    <section class="page-section" aria-labelledby="tasks">
+        <h2 id="tasks" class="section-title">Task list</h2>
+
+        <form method="GET" action="{{ url_for('tasks') }}" class="card filter-form">
+            <div class="form-field">
+                <label for="status">Filter by status</label>
+                <select id="status" name="status">
+                    <option value="all" {% if selected_status == "all" %}selected{% endif %}>All tasks</option>
+                    <option value="pending" {% if selected_status == "pending" %}selected{% endif %}>Pending</option>
+                    <option value="completed" {% if selected_status == "completed" %}selected{% endif %}>Completed</option>
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="filter_priority">Filter by priority</label>
+                <select id="filter_priority" name="priority">
+                    <option value="all" {% if selected_priority == "all" %}selected{% endif %}>All priorities</option>
+                    <option value="Low" {% if selected_priority == "Low" %}selected{% endif %}>Low</option>
+                    <option value="Medium" {% if selected_priority == "Medium" %}selected{% endif %}>Medium</option>
+                    <option value="High" {% if selected_priority == "High" %}selected{% endif %}>High</option>
+                </select>
+            </div>
+
+            <button type="submit" class="button">Apply filters</button>
+        </form>
+
+        {% if tasks %}
+        <ul class="task-list">
+            {% for task in tasks %}
+            <li class="card task-card {% if task['completed'] == 1 %}task-card-done{% endif %}">
+                <div class="task-details">
+                    <h3 class="task-title">{{ task["title"] }}</h3>
+
+                    <div class="task-meta">
+                        <span class="task-meta-item">
+                            <span class="meta-label">Priority:</span>
+                            <span class="meta-value priority-value priority-{{ task['priority'] | lower }}">
+                                {{ task["priority"] }}
+                            </span>
+                        </span>
+
+                        {% if task["deadline"] %}
+                        <span class="meta-separator" aria-hidden="true">·</span>
+
+                        <span class="task-meta-item">
+                            <span class="meta-label">Deadline:</span>
+                            <span class="meta-value">
+                                {{ task["deadline"][8:10] }}/{{ task["deadline"][5:7] }}/{{ task["deadline"][0:4] }}
+                            </span>
+                        </span>
+
+                        {% if task["deadline"] < today and task["completed"] == 0 %}
+                        <span class="task-overdue">Overdue</span>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="task-actions">
+                    <a href="{{ url_for('edit_task', task_id=task['id']) }}" class="task-button edit">
+                        Edit<span class="visually-hidden"> task: {{ task["title"] }}</span>
+                    </a>
+
+                    {% if task["completed"] == 0 %}
+                    <form method="POST" action="{{ url_for('complete_task', task_id=task['id']) }}"
+                        class="task-action-form" data-preserve-scroll>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="status" value="{{ selected_status }}">
+                        <input type="hidden" name="priority" value="{{ selected_priority }}">
+
+                        <button type="submit" class="task-button complete">
+                            Complete<span class="visually-hidden"> task: {{ task["title"] }}</span>
+                        </button>
+                    </form>
+                    {% else %}
+                    <span class="completed-badge">✓ Completed</span>
+
+                    <form method="POST" action="{{ url_for('undo_task', task_id=task['id']) }}"
+                        class="task-action-form" data-preserve-scroll>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="status" value="{{ selected_status }}">
+                        <input type="hidden" name="priority" value="{{ selected_priority }}">
+
+                        <button type="submit" class="task-button undo">
+                            Undo<span class="visually-hidden"> completion of task: {{ task["title"] }}</span>
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    <form method="POST" action="{{ url_for('delete_task', task_id=task['id']) }}"
+                        class="task-action-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="status" value="{{ selected_status }}">
+                        <input type="hidden" name="priority" value="{{ selected_priority }}">
+
+                        <button type="submit" class="task-button delete">
+                            Delete<span class="visually-hidden"> task: {{ task["title"] }}</span>
+                        </button>
+                    </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="card empty-state">
+            <p class="empty-state-title">No tasks to show</p>
+            <p>Add a task above, or change the filters to see more.</p>
+        </div>
+        {% endif %}
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='preserve-scroll.js') }}"></script>
+{% endblock %}
