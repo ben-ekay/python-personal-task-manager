@@ -1,16 +1,29 @@
-# Environment variables and secrets
+# Environment variables and secrets (the example file is safe to share)
 .env
+.env.*
+!.env.example
 
-# Python virtual environment
+# Python virtual environments
 .venv/
-.venv-1/
+.venv-*/
+venv/
 
-# Python cache
+# Python cache and test output
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
 
-# Local database
+# Local SQLite databases (contain real user data)
 task_manager.db
+*.db
+*.sqlite3
+
+# Editor and AI tool folders
+.idea/
+.vscode/
+.claude/
 
 # macOS system files
 .DS_Store
