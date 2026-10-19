@@ -1,118 +1,568 @@
 /* ========================================
-   TASKFLOW — DASHBOARD DESIGN
-   Filter toolbar
+   TASKFLOW — APP STYLES
+   Signed-in pages only (Dashboard and Edit Task). Loaded by
+   app_base.html and uses the variables defined in style.css.
+
+   1. App layout
+   2. Sidebar
+   3. Page header and sections
+   4. Statistics and progress
+   5. Add task and filter forms
+   6. Task list
+   7. Task details and priority
+   8. Task actions
+   9. Empty state
+   10. Edit task
+   11. Responsive
 ======================================== */
 
-.main-content .filter-form {
-    width: 100%;
-    max-width: none;
-    margin: 20px 0 28px;
-    padding: 24px;
-    box-sizing: border-box;
 
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    align-items: end;
-    gap: 20px;
+/* ========================================
+   1. APP LAYOUT
+======================================== */
 
-    background-color: var(--color-white);
-    border: 1px solid var(--slate-200);
-    border-radius: var(--radius-panel);
-    box-shadow: var(--shadow-toolbar);
+.app-layout {
+    display: flex;
+    min-height: 100vh;
 }
 
-.main-content .filter-field {
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
+.main-content {
+    flex: 1;
     min-width: 0;
 }
 
-.main-content .filter-field label {
-    margin: 0;
-    color: var(--slate-700);
-    font-size: 13px;
-    font-weight: 600;
+.page-body {
+    max-width: var(--content-width);
+    padding: var(--space-8) var(--space-10) var(--space-16);
 }
 
-.main-content .filter-field select {
-    width: 100%;
-    height: 44px;
-    padding: 0 14px;
 
-    background-color: var(--slate-50);
-    border: 1px solid var(--slate-300);
-    border-radius: var(--radius-control);
+/* ========================================
+   2. SIDEBAR
+======================================== */
 
-    color: var(--slate-900);
-    font-family: inherit;
-    font-size: 14px;
-    cursor: pointer;
-
-    transition: border-color var(--transition-fast),
-        box-shadow var(--transition-fast);
+.sidebar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    width: 248px;
+    min-width: 248px;
+    height: 100vh;
+    padding: var(--space-6) var(--space-4);
+    background-color: var(--color-navy);
 }
 
-.main-content .filter-field select:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: var(--shadow-focus);
-}
-
-.main-content .filter-form .button {
-    height: 44px;
-    min-height: 44px;
-    padding: 0 26px;
-    margin: 0;
-
-    background-color: var(--color-primary);
-    border: 1px solid var(--color-primary);
-    border-radius: var(--radius-control);
-
+.brand-on-dark,
+.brand-on-dark:hover {
     color: var(--color-white);
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 600;
+}
 
+.sidebar .brand {
+    margin: 0 0 var(--space-10) var(--space-2);
+}
+
+.sidebar-label {
+    margin: 0 0 var(--space-2) var(--space-3);
+    color: var(--color-sidebar-muted);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--control-height);
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-md);
+    color: var(--color-sidebar-text);
+    font-size: var(--text-md);
+    font-weight: 500;
+    text-decoration: none;
     transition: background-color var(--transition-fast),
-        transform var(--transition-fast);
+        color var(--transition-fast);
 }
 
-.main-content .filter-form .button:hover {
-    background-color: var(--color-primary-hover);
-    transform: translateY(-1px);
+.nav-link:hover {
+    background-color: var(--color-navy-hover);
+    color: var(--color-white);
 }
 
-.main-content .filter-form .button:focus-visible {
-    outline: var(--focus-outline);
-    outline-offset: 3px;
+.nav-link.active {
+    background-color: var(--color-primary);
+    color: var(--color-white);
 }
 
-/* Responsive filter layout */
+.nav-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
 
-@media (max-width: 800px) {
-    .main-content .filter-form {
-        grid-template-columns: 1fr;
-        gap: 16px;
-        padding: 20px;
+/* A blue outline would be hard to see on navy, so use white. */
+.sidebar :focus-visible {
+    outline-color: var(--color-white);
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-navy-hover);
+}
+
+.sidebar-user {
+    display: flex;
+    flex-direction: column;
+    margin: 0 var(--space-3) var(--space-3);
+    min-width: 0;
+}
+
+.sidebar-user-label {
+    color: var(--color-sidebar-muted);
+    font-size: var(--text-xs);
+}
+
+.sidebar-user-name {
+    overflow: hidden;
+    color: var(--color-white);
+    font-size: var(--text-md);
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* ========================================
+   3. PAGE HEADER AND SECTIONS
+======================================== */
+
+.page-header {
+    padding: var(--space-8) var(--space-10) var(--space-6);
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.header-label {
+    color: var(--color-primary);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.page-header h1 {
+    margin-top: var(--space-1);
+    font-size: var(--text-xl);
+    letter-spacing: -0.01em;
+}
+
+.header-subtitle {
+    margin-top: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+}
+
+.page-section + .page-section {
+    margin-top: var(--space-10);
+}
+
+.section-title {
+    margin-bottom: var(--space-4);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+
+/* ========================================
+   4. STATISTICS AND PROGRESS
+======================================== */
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-5);
+}
+
+.stat-card h3 {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.stat-value {
+    margin-top: var(--space-2);
+    color: var(--color-heading);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.progress-bar {
+    height: 8px;
+    margin-top: var(--space-3);
+    overflow: hidden;
+    background-color: var(--color-border);
+    border-radius: var(--radius-full);
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--color-primary);
+    border-radius: var(--radius-full);
+    transition: width var(--transition-medium);
+}
+
+
+/* ========================================
+   5. ADD TASK AND FILTER FORMS
+======================================== */
+
+.add-task-form,
+.filter-form {
+    display: grid;
+    align-items: end;
+    gap: var(--space-4);
+    padding: var(--space-5);
+}
+
+.add-task-form {
+    grid-template-columns: 2fr 1fr 1fr auto;
+}
+
+.filter-form {
+    grid-template-columns: 1fr 1fr auto;
+    margin-bottom: var(--space-4);
+}
+
+
+/* ========================================
+   6. TASK LIST
+======================================== */
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.task-card {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    transition: border-color var(--transition-fast);
+}
+
+.task-card:hover {
+    border-color: var(--color-border-strong);
+}
+
+.task-details {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+}
+
+.task-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.task-card-done {
+    background-color: var(--color-bg);
+}
+
+.task-card-done .task-title {
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+}
+
+
+/* ========================================
+   7. TASK DETAILS AND PRIORITY
+   Priority is coloured text next to a "Priority:" label,
+   so the meaning never depends on colour alone.
+======================================== */
+
+.task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-3);
+    font-size: var(--text-sm);
+}
+
+.task-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.meta-label {
+    color: var(--color-text-muted);
+}
+
+.meta-value {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.meta-separator {
+    color: var(--color-border-strong);
+}
+
+.priority-value.priority-high {
+    color: var(--color-priority-high);
+}
+
+.priority-value.priority-medium {
+    color: var(--color-priority-medium);
+}
+
+.priority-value.priority-low {
+    color: var(--color-priority-low);
+}
+
+.task-overdue {
+    color: var(--color-danger);
+    font-size: var(--text-xs);
+    font-weight: 600;
+}
+
+.task-overdue::before {
+    content: "●";
+    margin-right: var(--space-1);
+    font-size: 8px;
+    vertical-align: middle;
+}
+
+
+/* ========================================
+   8. TASK ACTIONS
+======================================== */
+
+.task-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.task-action-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+.task-button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 var(--space-3);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: var(--text-md);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.task-button:hover {
+    background-color: var(--color-bg);
+    text-decoration: underline;
+}
+
+.task-button.edit {
+    color: var(--color-primary);
+}
+
+.task-button.complete {
+    color: var(--color-success);
+}
+
+.task-button.delete {
+    color: var(--color-danger);
+}
+
+.completed-badge {
+    padding: 0 var(--space-3);
+    color: var(--color-success);
+    font-size: var(--text-md);
+    font-weight: 600;
+}
+
+
+/* ========================================
+   9. EMPTY STATE
+======================================== */
+
+.empty-state {
+    padding: var(--space-10) var(--space-6);
+    text-align: center;
+}
+
+.empty-state-title {
+    color: var(--color-heading);
+    font-weight: 600;
+}
+
+.empty-state p + p {
+    margin-top: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+}
+
+
+/* ========================================
+   10. EDIT TASK
+======================================== */
+
+.edit-card {
+    max-width: 640px;
+    padding: var(--space-6);
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin-top: var(--space-5);
+}
+
+
+/* ========================================
+   11. RESPONSIVE
+======================================== */
+
+@media (max-width: 1000px) {
+    .add-task-form {
+        grid-template-columns: 1fr 1fr;
     }
 
-    .main-content .filter-form .button {
+    .add-task-form .form-field:first-of-type {
+        grid-column: 1 / -1;
+    }
+
+    .add-task-form .button {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-layout {
+        flex-direction: column;
+    }
+
+    /* Sidebar becomes a top bar: brand and logout on one row, links below. */
+    .sidebar {
+        position: static;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: var(--space-3);
         width: 100%;
-        justify-self: stretch;
+        min-width: 0;
+        height: auto;
+        padding: var(--space-3) var(--space-4);
+    }
+
+    .sidebar .brand {
+        margin: 0;
+    }
+
+    .sidebar-label,
+    .sidebar-user {
+        display: none;
+    }
+
+    .sidebar-nav {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        flex-direction: row;
+    }
+
+    .sidebar-nav .nav-link {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .sidebar-footer {
+        grid-column: 2;
+        grid-row: 1;
+        margin: 0;
+        padding: 0;
+        border: none;
+    }
+
+    .page-header {
+        padding: var(--space-6) var(--space-4) var(--space-5);
+    }
+
+    .page-body {
+        padding: var(--space-6) var(--space-4) var(--space-10);
+    }
+
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-3);
+    }
+
+    .filter-form {
+        grid-template-columns: 1fr;
     }
 }
 
-/* ===== FILTER TOOLBAR WIDTH FIX ===== */
+@media (max-width: 600px) {
+    .add-task-form {
+        grid-template-columns: 1fr;
+    }
 
-.main-content .hero .filter-form {
-    width: 100%;
-    max-width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-}
+    .add-task-form .button,
+    .filter-form .button {
+        width: 100%;
+    }
 
-.main-content .hero .filter-form select {
-    width: 100%;
-    box-sizing: border-box;
+    .task-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .task-actions {
+        margin-left: calc(-1 * var(--space-3));
+    }
+
+    .stat-value {
+        font-size: var(--text-xl);
+    }
 }

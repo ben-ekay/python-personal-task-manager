@@ -1,204 +1,169 @@
-{% extends "base.html" %}
+{% extends "app_base.html" %}
+
+{% set active_page = "dashboard" %}
 
 {% block title %}Dashboard | TaskFlow{% endblock %}
 
-{% block styles %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+{% block page_header %}
+    <p class="header-label">My workspace</p>
+    <h1>Welcome back, {{ session["user_name"] }}!</h1>
+    <p class="header-subtitle">Manage your tasks and track your progress.</p>
 {% endblock %}
 
-{% block content %}
-    <div class="app-layout">
+{% block page_content %}
+    <section class="page-section" aria-labelledby="overview-heading">
+        <h2 id="overview-heading" class="section-title">Overview</h2>
 
-        <aside class="sidebar">
-            <div class="sidebar-brand">
-                <span class="brand-icon">✓</span>
-                <h1>TaskFlow</h1>
+        <div class="dashboard-stats">
+            <div class="card stat-card">
+                <h3>Total Tasks</h3>
+                <p class="stat-value">{{ total_tasks }}</p>
             </div>
 
-            <p class="sidebar-label">WORKSPACE</p>
-
-            <nav class="sidebar-nav">
-                <a href="{{ url_for('dashboard') }}" class="nav-link active">
-                    Dashboard
-                </a>
-
-                <a href="{{ url_for('dashboard') }}#tasks" class="nav-link">
-                    My Tasks
-                </a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <a href="{{ url_for('logout') }}" class="nav-link">
-                    Logout
-                </a>
+            <div class="card stat-card">
+                <h3>Completed</h3>
+                <p class="stat-value">{{ completed_tasks }}</p>
             </div>
-        </aside>
 
-        <main class="main-content">
-            <header class="dashboard-header">
-                <div>
-                    <p class="header-label">MY WORKSPACE</p>
-                    <h2>Welcome back, {{ session["user_name"] }}!</h2>
-                    <p>Manage your tasks and track your progress.</p>
+            <div class="card stat-card">
+                <h3>Pending</h3>
+                <p class="stat-value">{{ pending_tasks }}</p>
+            </div>
+
+            <div class="card stat-card">
+                <h3>Progress</h3>
+                <p class="stat-value">{{ completion_percentage }}%</p>
+
+                {# The percentage above is the accessible value; the bar is visual only. #}
+                <div class="progress-bar" aria-hidden="true">
+                    <div class="progress-fill" style="width: {{ completion_percentage }}%;"></div>
                 </div>
-            </header>
+            </div>
+        </div>
+    </section>
 
-            <section class="hero">
-                <h2>Your Dashboard</h2>
+    <section class="page-section" aria-labelledby="add-task-heading">
+        <h2 id="add-task-heading" class="section-title">Add a task</h2>
 
-                <section class="dashboard-stats">
-                    <div class="stat-card">
-                        <h3>Total Tasks</h3>
-                        <p>{{ total_tasks }}</p>
+        <form method="POST" class="card add-task-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-field">
+                <label for="title">Task title</label>
+                <input type="text" id="title" name="title" placeholder="What do you need to do?" required>
+            </div>
+
+            <div class="form-field">
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="deadline">Deadline</label>
+                <input type="date" id="deadline" name="deadline">
+            </div>
+
+            <button type="submit" class="button">Add task</button>
+        </form>
+    </section>
+
+    <section class="page-section" aria-labelledby="tasks">
+        <h2 id="tasks" class="section-title">Your tasks</h2>
+
+        <form method="GET" action="{{ url_for('dashboard') }}" class="card filter-form">
+            <div class="form-field">
+                <label for="status">Filter by status</label>
+                <select id="status" name="status">
+                    <option value="all" {% if selected_status == "all" %}selected{% endif %}>All tasks</option>
+                    <option value="pending" {% if selected_status == "pending" %}selected{% endif %}>Pending</option>
+                    <option value="completed" {% if selected_status == "completed" %}selected{% endif %}>Completed</option>
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="filter_priority">Filter by priority</label>
+                <select id="filter_priority" name="priority">
+                    <option value="all" {% if selected_priority == "all" %}selected{% endif %}>All priorities</option>
+                    <option value="Low" {% if selected_priority == "Low" %}selected{% endif %}>Low</option>
+                    <option value="Medium" {% if selected_priority == "Medium" %}selected{% endif %}>Medium</option>
+                    <option value="High" {% if selected_priority == "High" %}selected{% endif %}>High</option>
+                </select>
+            </div>
+
+            <button type="submit" class="button">Apply filters</button>
+        </form>
+
+        {% if tasks %}
+        <ul class="task-list">
+            {% for task in tasks %}
+            <li class="card task-card {% if task['completed'] == 1 %}task-card-done{% endif %}">
+                <div class="task-details">
+                    <h3 class="task-title">{{ task["title"] }}</h3>
+
+                    <div class="task-meta">
+                        <span class="task-meta-item">
+                            <span class="meta-label">Priority:</span>
+                            <span class="meta-value priority-value priority-{{ task['priority'] | lower }}">
+                                {{ task["priority"] }}
+                            </span>
+                        </span>
+
+                        {% if task["deadline"] %}
+                        <span class="meta-separator" aria-hidden="true">·</span>
+
+                        <span class="task-meta-item">
+                            <span class="meta-label">Deadline:</span>
+                            <span class="meta-value">
+                                {{ task["deadline"][8:10] }}/{{ task["deadline"][5:7] }}/{{ task["deadline"][0:4] }}
+                            </span>
+                        </span>
+
+                        {% if task["deadline"] < today and task["completed"] == 0 %}
+                        <span class="task-overdue">Overdue</span>
+                        {% endif %}
+                        {% endif %}
                     </div>
+                </div>
 
-                    <div class="stat-card">
-                        <h3>Completed</h3>
-                        <p>{{ completed_tasks }}</p>
-                    </div>
+                <div class="task-actions">
+                    <a href="{{ url_for('edit_task', task_id=task['id']) }}" class="task-button edit">
+                        Edit<span class="visually-hidden"> task: {{ task["title"] }}</span>
+                    </a>
 
-                    <div class="stat-card">
-                        <h3>Pending</h3>
-                        <p>{{ pending_tasks }}</p>
-                    </div>
+                    {% if task["completed"] == 0 %}
+                    <form method="POST" action="{{ url_for('complete_task', task_id=task['id']) }}"
+                        class="task-action-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                    <div class="stat-card progress-card">
-                        <h3>Progress</h3>
-                        <p>{{ completion_percentage }}%</p>
+                        <button type="submit" class="task-button complete">
+                            Complete<span class="visually-hidden"> task: {{ task["title"] }}</span>
+                        </button>
+                    </form>
+                    {% else %}
+                    <span class="completed-badge">✓ Completed</span>
+                    {% endif %}
 
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: {{ completion_percentage }}%;">
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                    <form method="POST" action="{{ url_for('delete_task', task_id=task['id']) }}"
+                        class="task-action-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                <p>Your personal tasks will appear here.</p>
-                <form method="POST" class="add-task-form">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                    <div class="form-field">
-                        <label for="title">Task</label>
-                        <input type="text" id="title" name="title" placeholder="Enter a task" required>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="priority">Priority</label>
-                        <select id="priority" name="priority">
-                            <option value="Low">Low</option>
-                            <option value="Medium" selected>Medium</option>
-                            <option value="High">High</option>
-                        </select>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="deadline">Deadline</label>
-                        <input type="date" id="deadline" name="deadline">
-                    </div>
-
-                    <button type="submit" class="button">Add Task</button>
-                </form>
-
-                <h2 id="tasks">Your Tasks</h2>
-
-                <form method="GET" action="{{ url_for('dashboard') }}" class="filter-form">
-                    <div class="filter-field">
-                        <label for="status">Filter by status</label>
-                        <select id="status" name="status">
-                            <option value="all" {% if selected_status=="all" %}selected{% endif %}>All Tasks</option>
-                            <option value="pending" {% if selected_status=="pending" %}selected{% endif %}>Pending
-                            </option>
-                            <option value="completed" {% if selected_status=="completed" %}selected{% endif %}>Completed
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="filter-field">
-                        <label for="filter_priority">Filter by priority</label>
-                        <select id="filter_priority" name="priority">
-                            <option value="all" {% if selected_priority=="all" %}selected{% endif %}>All Priorities
-                            </option>
-                            <option value="Low" {% if selected_priority=="Low" %}selected{% endif %}>Low</option>
-                            <option value="Medium" {% if selected_priority=="Medium" %}selected{% endif %}>Medium
-                            </option>
-                            <option value="High" {% if selected_priority=="High" %}selected{% endif %}>High</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="button">Filter</button>
-                </form>
-
-                {% if tasks %}
-                <ul class="task-list">
-                    {% for task in tasks %}
-                    <li class="task-card {% if task['completed'] == 1 %}task-card-done{% endif %}">
-                        <div class="task-info">
-                            <div class="task-details">
-                                <h3 class="task-title">{{ task["title"] }}</h3>
-
-                                <div class="task-meta">
-                                    <span class="task-meta-item">
-                                        <span class="meta-label">Priority:</span>
-                                        <span class="meta-value priority-value priority-{{ task['priority'] | lower }}">
-                                            {{ task["priority"] }}
-                                        </span>
-                                    </span>
-
-                                    {% if task["deadline"] %}
-                                    <span class="meta-separator">·</span>
-
-                                    <span class="task-meta-item">
-                                        <span class="meta-label">Deadline:</span>
-                                        <span class="meta-value">
-                                            {{ task["deadline"][8:10] }}/{{ task["deadline"][5:7] }}/{{
-                                            task["deadline"][0:4] }}
-                                        </span>
-                                    </span>
-
-                                    {% if task["deadline"] < today and task["completed"]==0 %} <span
-                                        class="task-overdue">Overdue</span>
-                                        {% endif %}
-                                        {% endif %}
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="task-actions">
-
-                            <a href="{{ url_for('edit_task', task_id=task['id']) }}" class="task-button edit">
-                                Edit
-                            </a>
-
-                            {% if task["completed"] == 0 %}
-                            <form method="POST" action="{{ url_for('complete_task', task_id=task['id']) }}"
-                                class="task-action-form">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                                <button type="submit" class="task-button complete">
-                                    Complete
-                                </button>
-                            </form>
-                            {% else %}
-                            <span class="completed-badge">✓ Completed</span>
-                            {% endif %}
-
-                            <form method="POST" action="{{ url_for('delete_task', task_id=task['id']) }}"
-                                class="task-action-form">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                                <button type="submit" class="task-button delete">
-                                    Delete
-                                </button>
-                            </form>
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <p>You do not have any tasks yet.</p>
-                {% endif %}
-
-            </section>
-        </main>
-    </div>
+                        <button type="submit" class="task-button delete">
+                            Delete<span class="visually-hidden"> task: {{ task["title"] }}</span>
+                        </button>
+                    </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="card empty-state">
+            <p class="empty-state-title">No tasks to show</p>
+            <p>Add a task above, or change the filters to see more.</p>
+        </div>
+        {% endif %}
+    </section>
 {% endblock %}

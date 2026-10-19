@@ -1,33 +1,31 @@
-{% extends "base.html" %}
+{% extends "app_base.html" %}
+
+{% set active_page = "tasks" %}
 
 {% block title %}Edit Task | TaskFlow{% endblock %}
 
-{% block content %}
-    <header>
-        <h1>Personal Task Manager</h1>
-    </header>
+{% block page_header %}
+    <p class="header-label">My tasks</p>
+    <h1>Edit task</h1>
+    <p class="header-subtitle">Update the title of your task, then save your changes.</p>
+{% endblock %}
 
-    <main>
-        <section class="hero">
+{% block page_content %}
+    <section class="card edit-card" aria-labelledby="edit-heading">
+        <h2 id="edit-heading" class="card-title">Task details</h2>
 
-            <h2>Edit Task</h2>
+        <form method="POST" class="edit-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-            <form method="POST">
-
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                <label for="title">Task</label>
-
+            <div class="form-field">
+                <label for="title">Task title</label>
                 <input type="text" id="title" name="title" value="{{ task['title'] }}" required>
+            </div>
 
-                <button type="submit">Save Changes</button>
-
-            </form>
-
-            <a href="{{ url_for('dashboard') }}">
-                Back to Dashboard
-            </a>
-
-        </section>
-    </main>
+            <div class="form-actions">
+                <button type="submit" class="button">Save changes</button>
+                <a href="{{ url_for('dashboard') }}" class="button secondary">Cancel</a>
+            </div>
+        </form>
+    </section>
 {% endblock %}

@@ -1,23 +1,68 @@
 {% extends "base.html" %}
 
-{% block title %}TaskFlow | Personal Task Manager{% endblock %}
+{% block title %}TaskFlow{% endblock %}
 
 {% block content %}
-    <header>
-        <h1>Personal Task Manager</h1>
-        <p>Organise your tasks and track your progress.</p>
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a href="{{ url_for('home') }}" class="brand">
+                <span class="brand-icon" aria-hidden="true">✓</span>
+                <span class="brand-name">TaskFlow</span>
+            </a>
+
+            <nav aria-label="Account">
+                <a href="{{ url_for('login') }}" class="button secondary">Log in</a>
+            </nav>
+        </div>
     </header>
 
-    <main>
-        <section class="hero">
-            <h2>Stay organised</h2>
-            <p>
-                Create, manage and complete your personal tasks in one place.
+    <main class="home">
+        <section class="home-hero">
+            <p class="eyebrow">Personal task management</p>
+            <h1 class="home-title">Organise your tasks. Track your progress.</h1>
+            <p class="home-lead">
+                Create, manage and complete your personal tasks in one place, with priorities,
+                deadlines and a clear view of what is done.
             </p>
 
             <div class="actions">
-                <a href="{{ url_for('register') }}" class="button">Register</a>
-                <a href="{{ url_for('login') }}" class="button secondary">Login</a>
+                <a href="{{ url_for('register') }}" class="button">Create an account</a>
+                <a href="{{ url_for('login') }}" class="button secondary">Log in</a>
+            </div>
+        </section>
+
+        <section class="feature-grid" aria-label="Features">
+            <div class="card feature-card">
+                <span class="feature-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M5 21V4" />
+                        <path d="M5 4h12l-2.5 4L17 12H5" />
+                    </svg>
+                </span>
+                <h2>Set priorities</h2>
+                <p>Mark each task as low, medium or high priority so you know what to tackle first.</p>
+            </div>
+
+            <div class="card feature-card">
+                <span class="feature-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <rect x="3" y="5" width="18" height="16" rx="2" />
+                        <path d="M16 3v4M8 3v4M3 10h18" />
+                    </svg>
+                </span>
+                <h2>Track deadlines</h2>
+                <p>Add due dates to your tasks and spot overdue work at a glance.</p>
+            </div>
+
+            <div class="card feature-card">
+                <span class="feature-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M3 20h18" />
+                        <path d="M6 16v-5M12 16V6M18 16V9" />
+                    </svg>
+                </span>
+                <h2>See your progress</h2>
+                <p>Your dashboard shows completed and pending tasks with a live progress bar.</p>
             </div>
         </section>
     </main>

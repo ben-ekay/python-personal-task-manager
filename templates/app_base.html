@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{# Layout for signed-in pages: sidebar navigation plus a page header and body.
+   Child templates set active_page and fill page_header and page_content. #}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <div class="app-layout">
+
+        <aside class="sidebar">
+            <a href="{{ url_for('dashboard') }}" class="brand brand-on-dark">
+                <span class="brand-icon" aria-hidden="true">✓</span>
+                <span class="brand-name">TaskFlow</span>
+            </a>
+
+            <p class="sidebar-label">Workspace</p>
+
+            <nav class="sidebar-nav" aria-label="Main navigation">
+                <a href="{{ url_for('dashboard') }}"
+                    class="nav-link {% if active_page == 'dashboard' %}active{% endif %}"
+                    {% if active_page == 'dashboard' %}aria-current="page"{% endif %}>
+                    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="{{ url_for('dashboard') }}#tasks"
+                    class="nav-link {% if active_page == 'tasks' %}active{% endif %}"
+                    {% if active_page == 'tasks' %}aria-current="page"{% endif %}>
+                    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M10 6h10M10 12h10M10 18h10" />
+                        <path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17" />
+                    </svg>
+                    <span>My Tasks</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p class="sidebar-user">
+                    <span class="sidebar-user-label">Signed in as</span>
+                    <span class="sidebar-user-name">{{ session["user_name"] }}</span>
+                </p>
+
+                <a href="{{ url_for('logout') }}" class="nav-link">
+                    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
+                    </svg>
+                    <span>Log out</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content" id="main-content">
+            <header class="page-header">
+                {% block page_header %}{% endblock %}
+            </header>
+
+            <div class="page-body">
+                {% block page_content %}{% endblock %}
+            </div>
+        </main>
+
+    </div>
+{% endblock %}
