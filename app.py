@@ -252,6 +252,23 @@ def dashboard():
     )
 
 
+def redirect_to_dashboard():
+    # Return to the dashboard with the filters the user had applied.
+    # Only known values are passed on, so the form cannot inject anything else.
+    filters = {}
+
+    status = request.form.get("status")
+    priority = request.form.get("priority")
+
+    if status in ["pending", "completed"]:
+        filters["status"] = status
+
+    if priority in ["Low", "Medium", "High"]:
+        filters["priority"] = priority
+
+    return redirect(url_for("dashboard", **filters))
+
+
 @app.route("/complete/<int:task_id>", methods=["POST"])
 def complete_task(task_id):
     if "user_id" not in session:
@@ -271,7 +288,29 @@ def complete_task(task_id):
     connection.commit()
     connection.close()
 
-    return redirect(url_for("dashboard"))
+    return redirect_to_dashboard()
+
+
+@app.route("/undo/<int:task_id>", methods=["POST"])
+def undo_task(task_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    connection = get_db_connection()
+
+    connection.execute(
+        """
+        UPDATE tasks
+        SET completed = 0
+        WHERE id = ? AND user_id = ?
+        """,
+        (task_id, session["user_id"])
+    )
+
+    connection.commit()
+    connection.close()
+
+    return redirect_to_dashboard()
 
 
 @app.route("/edit/<int:task_id>", methods=["GET", "POST"])

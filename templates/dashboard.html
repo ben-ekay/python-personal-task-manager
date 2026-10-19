@@ -138,6 +138,8 @@
                     <form method="POST" action="{{ url_for('complete_task', task_id=task['id']) }}"
                         class="task-action-form">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="status" value="{{ selected_status }}">
+                        <input type="hidden" name="priority" value="{{ selected_priority }}">
 
                         <button type="submit" class="task-button complete">
                             Complete<span class="visually-hidden"> task: {{ task["title"] }}</span>
@@ -145,6 +147,17 @@
                     </form>
                     {% else %}
                     <span class="completed-badge">✓ Completed</span>
+
+                    <form method="POST" action="{{ url_for('undo_task', task_id=task['id']) }}"
+                        class="task-action-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="status" value="{{ selected_status }}">
+                        <input type="hidden" name="priority" value="{{ selected_priority }}">
+
+                        <button type="submit" class="task-button undo">
+                            Undo<span class="visually-hidden"> completion of task: {{ task["title"] }}</span>
+                        </button>
+                    </form>
                     {% endif %}
 
                     <form method="POST" action="{{ url_for('delete_task', task_id=task['id']) }}"

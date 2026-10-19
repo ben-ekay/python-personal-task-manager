@@ -411,6 +411,10 @@
     color: var(--color-success);
 }
 
+.task-button.undo {
+    color: var(--color-text);
+}
+
 .task-button.delete {
     color: var(--color-danger);
 }
