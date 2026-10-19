@@ -13,9 +13,14 @@ app.secret_key = os.environ["FLASK_SECRET_KEY"]
 csrf = CSRFProtect()
 csrf.init_app(app)
 
+# Normally task_manager.db. The automated tests point TASKFLOW_DATABASE at a
+# temporary file so they never touch real data. It is read here, before the
+# tables are created below, because that happens as soon as app.py is imported.
+DATABASE = os.environ.get("TASKFLOW_DATABASE", "task_manager.db")
+
 
 def get_db_connection():
-    connection = sqlite3.connect("task_manager.db")
+    connection = sqlite3.connect(DATABASE)
     connection.row_factory = sqlite3.Row
     return connection
 
