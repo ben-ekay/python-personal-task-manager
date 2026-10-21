@@ -15,7 +15,8 @@ It was developed for the PFD200 Professional Development module as part of the F
 - [Security measures](#security-measures)
 - [Current limitations](#current-limitations)
 - [Future improvements](#future-improvements)
-- [Author](#author)
+- [Project author](#project-author)
+- [Copyright](#copyright)
 
 ## Features
 
@@ -128,6 +129,13 @@ python-personal-task-manager/
 ├── requirements.txt        Python dependencies with fixed versions
 ├── .env.example            Example configuration file (copy to .env)
 ├── .gitignore              Files that Git should not track
+├── docs/
+│   └── screenshots/        Screenshots shown in this README
+│       ├── dashboard.png
+│       ├── my-tasks.png
+│       ├── calendar.png
+│       ├── edit-task.png
+│       └── mobile-layout.png
 ├── static/
 │   ├── style.css           Shared styles and design variables
 │   ├── dashboard.css       Styles for the signed-in pages
@@ -165,8 +173,6 @@ Clone the repository and move into the project folder:
 git clone https://github.com/ben-ekay/python-personal-task-manager.git
 cd python-personal-task-manager
 ```
-
-If the repository is private, you will need to be given access by the author.
 
 Create and activate a virtual environment:
 
@@ -285,9 +291,15 @@ The interface was also checked manually in Safari on a desktop computer. JavaScr
 - Run the automated tests on every push using GitHub Actions.
 - Add browser-based tests for the interface.
 
-## Author
+## Project author
+
+TaskFlow was developed by Benjamin Ekay Gabilondo, the student developer, for the Professional Development (PFD200) mini-project on the FdSc Computing programme.
 
 - **Name:** Benjamin Ekay Gabilondo
 - **Course:** FdSc Computing
 - **Module:** PFD200 — Professional Development
 - **Year:** 2026
+
+## Copyright
+
+Copyright (c) 2026 Benjamin Ekay Gabilondo. All rights reserved.
